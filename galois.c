@@ -12,7 +12,7 @@
 /*------------------------- */
 int STEP = 100;
 							/* find better way to declare this variables */
-double LINE_THICKNESS = 2.0;
+double LINE_THICKNESS = 2.5;
 /*------------------------- */
 
 double f(double x) {
@@ -58,10 +58,9 @@ void ploting(SDL_Renderer *renderer, int width, int height, TTF_Font *font) {
 						width / 2, 0, 
 						width / 2, height); /* Drawing vertical axes line */
 
-	int positive_x = 0;
-	int negative_x = -(width / 2 / STEP); /* valuing start amount of negative_x variable */
+	/* Rendering small lines and numbers on axes */
+	int x_axes_number = -(width / 2 / STEP); /* valuing start amount of x axes */
 
-	/* Rendering numbers on axes */
 	for (int i=0; i<=width; i+=STEP) {
 		SDL_RenderDrawLine(renderer,
 				    i, height / 2 - 2,
@@ -70,11 +69,9 @@ void ploting(SDL_Renderer *renderer, int width, int height, TTF_Font *font) {
 		SDL_RenderDrawLine(renderer,
 				   width / 2 - 2, i,
 				   width / 2 + 2, i);
-		render_number(renderer, font, positive_x, width / 2 + i, height / 2);
-		positive_x++;
-		
-		/*if (negative_x != 0)
-			negative_x++; TODO: iplement negative number format for x coordinates */
+
+		render_number(renderer, font, x_axes_number, i, height / 2);
+		x_axes_number++; 
 	}
 
     int x_max = width / 2 / STEP; /* should be maximum coordinates for x but i am not sure that this is proper way */
@@ -149,11 +146,11 @@ int main(int argc, char *argv[]) {
 					switch(event.key.keysym.sym) {
 						case SDLK_PERIOD: /* increase the coordinate number spectrume */
 							STEP -= 10;
-							LINE_THICKNESS -= 0.05;
+							LINE_THICKNESS -= 0.025;
 							break;
 						case SDLK_COMMA: /* reduce the coordinate number spectrume */
 							STEP += 10;
-							LINE_THICKNESS += 0.05;
+							LINE_THICKNESS += 0.025;
 							break;
 						default:
 							break;
