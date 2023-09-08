@@ -15,6 +15,9 @@ int STEP = 100;
 double LINE_THICKNESS = 5.0;
 /*------------------------- */
 
+/* TODO: text prompt for inserting mathematical function */
+/* TODO: movement with mouse */
+
 double f(double x) {
 	return x * x;
 }
