@@ -1,5 +1,5 @@
 <h1 align="center">GALOIS</h1>
-    <p align="center">galois is currently very simple SDL mathematical ploting software go
+    <p align="center">galois is currently very simple SDL mathematical ploting software
 </p>
 
 ##
