@@ -4,13 +4,15 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL2_gfxPrimitives.h>
 
-#define SCREEN_WIDTH 600
-#define SCREEN_HEIGHT 600
-#define STEP 50
+#define SCREEN_WIDTH 800
+#define SCREEN_HEIGHT 800
 
-int f(int x) {
-	return pow(x, 2);
+int STEP = 100;
+
+double f(double x) {
+	return x * x;
 }
 
 /* rendering number text */
@@ -45,12 +47,12 @@ void ploting(SDL_Renderer *renderer, int width, int height, TTF_Font *font) {
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
     SDL_RenderDrawLine(renderer, 
-			0, height / 2, 
-			width, height / 2); /* Drawing horizontal axes line */
+						0, height / 2, 
+						width, height / 2); /* Drawing horizontal axes line */
 
     SDL_RenderDrawLine(renderer, 
-			width / 2, 0, 
-			width / 2, height); /* Drawing vertical axes line */
+						width / 2, 0, 
+						width / 2, height); /* Drawing vertical axes line */
 
 	int positive_x = 0;
 	int negative_x = -(width / 2 / STEP); /* valuing start amount of negative_x variable */
@@ -66,11 +68,24 @@ void ploting(SDL_Renderer *renderer, int width, int height, TTF_Font *font) {
 				   width / 2 + 2, i);
 		render_number(renderer, font, positive_x, width / 2 + i, height / 2);
 		positive_x++;
-
-		/* Ploting f(x) function */
-		int y = f(positive_x);
-		printf("%d\n", y);
+		
+		/*if (negative_x != 0)
+			negative_x++; TODO: iplement negative number format for x coordinates */
 	}
+
+    int x_max = width / 2 / STEP; /* should be maximum coordinates for x but i am not sure that this is proper way */
+    int y_max = height / 2 / STEP; /* same thing but for y */
+    double step = 1.00; /* TODO: get the step from STEP variable */
+
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); /* color red for dots */
+	for (double x = -x_max; x <= x_max; x += step) { /* looping through all the values of x */
+        double function = f(x);
+        int x_pos = (int)(x * STEP) + width / 2;
+        int y_pos = height / 2 - (int)(function * STEP);
+
+        SDL_RenderDrawPoint(renderer, x_pos, y_pos);
+    }
+	// TODO: draw line between points with thicklineRGBA()
 }
 
 int main(int argc, char *argv[]) {
@@ -104,13 +119,25 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	TTF_Font *font = TTF_OpenFont("./Quarto-Regular.ttf", 16);
+	TTF_Font *font = TTF_OpenFont("./Fixed-Sys.ttf", 15);
 	
 	SDL_Event event;
 	int quit = 0;
 	while (!quit) {
 		while(SDL_PollEvent(&event)) {
 			switch (event.type) {
+				case SDL_KEYDOWN:
+					switch(event.key.keysym.sym) {
+						case SDLK_PERIOD: /* increase the coordinate number spectrume */
+							STEP -= 10;
+							break;
+						case SDLK_COMMA: /* reduce the coordinate number spectrume */
+							STEP += 10;
+							break;
+						default:
+							break;
+					}
+					break;
 				case SDL_QUIT:
 					quit = 1;
 					break;
@@ -123,7 +150,7 @@ int main(int argc, char *argv[]) {
 		int width = SDL_GetWindowSurface(window)->w;
 		int height = SDL_GetWindowSurface(window)->h;
 
-		printf("width: %d\nheight: %d\n", width, height);
+		// printf("width: %d\nheight: %d\n", width, height);
 		ploting(renderer, width, height, font);
 
 		SDL_RenderPresent(renderer);
