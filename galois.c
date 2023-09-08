@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <math.h>
 
 #include <SDL2/SDL.h>
@@ -13,10 +14,11 @@
 int STEP = 100;
 							/* find better way to declare this variables */
 double LINE_THICKNESS = 5.0;
+
+bool show_line = true;
 /*------------------------- */
 
 /* TODO: text prompt for inserting mathematical function */
-/* TODO: movement with mouse */
 
 double f(double x) {
 	return x * x;
@@ -94,20 +96,22 @@ void ploting(SDL_Renderer *renderer, int width, int height, TTF_Font *font, doub
         int x_pos = (int)(x * STEP) + width / 2;
         int y_pos = height / 2 - (int)(function * STEP);
 
-        SDL_RenderDrawPoint(renderer, x_pos, y_pos);
 
-		/* TODO: draw line clever way */
-		thickLineRGBA(renderer,
-					  previous_x_pos, previous_y_pos,
-					  x_pos, y_pos,
-					  LINE_THICKNESS,
-					  255,
-					  0,
-					  0,
-					  255);
+		if (show_line) {
+			/* TODO: draw line clever way */
+			thickLineRGBA(renderer,
+						  previous_x_pos, previous_y_pos,
+						  x_pos, y_pos,
+						  LINE_THICKNESS,
+						  255,
+						  0,
+						  0,
+						  255);
 
-		previous_x_pos = x_pos;
-		previous_y_pos = y_pos;
+			previous_x_pos = x_pos;
+			previous_y_pos = y_pos;
+		} else 
+			SDL_RenderDrawPoint(renderer, x_pos, y_pos);
     }
 }
 
@@ -142,12 +146,14 @@ int main(int argc, char *argv[]) {
 	}
 
 	TTF_Font *font = TTF_OpenFont("./fonts/Fixed-Sys.ttf", 14);
+
 	
 	SDL_Event event;
 	int quit = 0;
 	while (!quit) {
 		while(SDL_PollEvent(&event)) {
 			switch (event.type) {
+				/* TODO: movement with mouse */
 				case SDL_KEYDOWN:
 					switch(event.key.keysym.sym) {
 						case SDLK_MINUS: /* increase the coordinate number spectrume */
@@ -158,6 +164,11 @@ int main(int argc, char *argv[]) {
 						case SDLK_EQUALS: /* reduce the coordinate number spectrume */
 							STEP += 5;
 							LINE_THICKNESS += 0.15;
+							break;
+						case SDLK_l: /* toggle line drawing on "l" */
+							if (show_line) 
+								show_line = false;
+							else show_line = true;
 							break;
 						default:
 							break;
@@ -175,7 +186,6 @@ int main(int argc, char *argv[]) {
 		int width = SDL_GetWindowSurface(window)->w;
 		int height = SDL_GetWindowSurface(window)->h;
 
-		// printf("width: %d\nheight: %d\n", width, height);
 		rendering_coordinate_system(renderer, width, height, font);
 		ploting(renderer, width , height, font, LINE_THICKNESS);
 
