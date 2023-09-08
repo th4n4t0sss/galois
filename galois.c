@@ -145,14 +145,14 @@ int main(int argc, char *argv[]) {
 			switch (event.type) {
 				case SDL_KEYDOWN:
 					switch(event.key.keysym.sym) {
-						case SDLK_PERIOD: /* increase the coordinate number spectrume */
+						case SDLK_MINUS: /* increase the coordinate number spectrume */
 							STEP -= 10;
 							if (LINE_THICKNESS >= 1.0)
 								LINE_THICKNESS -= 0.25;
 							break;
-						case SDLK_COMMA: /* reduce the coordinate number spectrume */
+						case SDLK_EQUALS: /* reduce the coordinate number spectrume */
 							STEP += 10;
-							LINE_THICKNESS += 0.025;
+							LINE_THICKNESS += 0.25;
 							break;
 						default:
 							break;
