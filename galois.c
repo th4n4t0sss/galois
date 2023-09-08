@@ -141,7 +141,7 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	TTF_Font *font = TTF_OpenFont("./Fixed-Sys.ttf", 14);
+	TTF_Font *font = TTF_OpenFont("./fonts/Fixed-Sys.ttf", 14);
 	
 	SDL_Event event;
 	int quit = 0;
