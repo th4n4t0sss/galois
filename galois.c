@@ -45,12 +45,12 @@ void ploting(SDL_Renderer *renderer, int width, int height, TTF_Font *font) {
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
     SDL_RenderDrawLine(renderer, 
-						0, height / 2, 
-						width, height / 2); /* Drawing horizontal axes line */
+			0, height / 2, 
+			width, height / 2); /* Drawing horizontal axes line */
 
     SDL_RenderDrawLine(renderer, 
-						width / 2, 0, 
-						width / 2, height); /* Drawing vertical axes line */
+			width / 2, 0, 
+			width / 2, height); /* Drawing vertical axes line */
 
 	int positive_x = 0;
 	int negative_x = -(width / 2 / STEP); /* valuing start amount of negative_x variable */
@@ -58,12 +58,12 @@ void ploting(SDL_Renderer *renderer, int width, int height, TTF_Font *font) {
 	/* Rendering numbers on axes */
 	for (int i=0; i<=width; i+=STEP) {
 		SDL_RenderDrawLine(renderer,
-							i, height / 2 - 2,
-							i, height / 2 + 2);
+				    i, height / 2 - 2,
+				    i, height / 2 + 2);
 
 		SDL_RenderDrawLine(renderer,
-							width / 2 - 2, i,
-							width / 2 + 2, i);
+				   width / 2 - 2, i,
+				   width / 2 + 2, i);
 		render_number(renderer, font, positive_x, width / 2 + i, height / 2);
 		positive_x++;
 
@@ -86,9 +86,9 @@ int main(int argc, char *argv[]) {
 	}
 	
 	SDL_Window *window = SDL_CreateWindow("Galois",
-										SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,
-										SCREEN_WIDTH, SCREEN_HEIGHT,
-										SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN);
+						SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,
+						SCREEN_WIDTH, SCREEN_HEIGHT,
+						SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN);
 
 	if (window == NULL) {
 		fprintf(stderr, "could not initialize window: %s\n", SDL_GetError()) ;
@@ -96,8 +96,8 @@ int main(int argc, char *argv[]) {
 	}
 	
 	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1,
-												SDL_RENDERER_ACCELERATED |
-												SDL_RENDERER_PRESENTVSYNC);
+						     SDL_RENDERER_ACCELERATED |
+						     SDL_RENDERER_PRESENTVSYNC);
 	if (renderer == NULL) {
 		SDL_DestroyWindow(window);
 		fprintf(stderr, "could not initialize renderer: %s\n", SDL_GetError()) ; 
