@@ -58,9 +58,9 @@ void rendering_coordinate_system(SDL_Renderer *renderer, int width, int height, 
 
 	/* Rendering small lines and numbers on axes */
 	int x_axes_number = -(width / 2 / STEP); /* valuing start amount of x axes */
+	int y_axes_number = height / 2 / STEP;
 
 	for (int i=0; i<=width; i+=STEP) {
-		/* drawing small lines on axes */
 		SDL_RenderDrawLine(renderer,
 				    i, height / 2 - 2,
 				    i, height / 2 + 2);
@@ -70,7 +70,9 @@ void rendering_coordinate_system(SDL_Renderer *renderer, int width, int height, 
 				   width / 2 + 2, i);
 
 		render_number(renderer, font, x_axes_number, i, height / 2); /* rendering numbers on axes */
+		render_number(renderer, font, y_axes_number, width / 2, i); /* rendering numbers on axes */
 		x_axes_number++; 
+		y_axes_number--;
 	}
 }
 
@@ -147,12 +149,12 @@ int main(int argc, char *argv[]) {
 					switch(event.key.keysym.sym) {
 						case SDLK_MINUS: /* increase the coordinate number spectrume */
 							STEP -= 5;
-							if (LINE_THICKNESS > 1.5)
-								LINE_THICKNESS -= 0.25;
+							if (LINE_THICKNESS > 2.0)
+								LINE_THICKNESS -= 0.15;
 							break;
 						case SDLK_EQUALS: /* reduce the coordinate number spectrume */
 							STEP += 5;
-							LINE_THICKNESS += 0.25;
+							LINE_THICKNESS += 0.15;
 							break;
 						default:
 							break;
