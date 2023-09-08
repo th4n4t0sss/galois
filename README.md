@@ -4,5 +4,5 @@
 
 ##
 <p align="center">
-    ![galois](http://0x0.st/Hfqx.png)
+    <img src="http://0x0.st/Hfqx.png" width="500px">
 </p>
