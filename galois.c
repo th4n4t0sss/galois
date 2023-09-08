@@ -9,7 +9,11 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 800
 
+/*------------------------- */
 int STEP = 100;
+							/* find better way to declare this variables */
+double LINE_THICKNESS = 2.0;
+/*------------------------- */
 
 double f(double x) {
 	return x * x;
@@ -77,6 +81,9 @@ void ploting(SDL_Renderer *renderer, int width, int height, TTF_Font *font) {
     int y_max = height / 2 / STEP; /* same thing but for y */
     double step = 1.00; /* TODO: get the step from STEP variable */
 
+	int previous_x_pos = 0;
+	int previous_y_pos = 0;
+
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); /* color red for dots */
 	for (double x = -x_max; x <= x_max; x += step) { /* looping through all the values of x */
         double function = f(x);
@@ -84,8 +91,20 @@ void ploting(SDL_Renderer *renderer, int width, int height, TTF_Font *font) {
         int y_pos = height / 2 - (int)(function * STEP);
 
         SDL_RenderDrawPoint(renderer, x_pos, y_pos);
+
+		/* TODO: draw line clever way */
+		thickLineRGBA(renderer,
+					  previous_x_pos, previous_y_pos,
+					  x_pos, y_pos,
+					  LINE_THICKNESS,
+					  255,
+					  0,
+					  0,
+					  255);
+
+		previous_x_pos = x_pos;
+		previous_y_pos = y_pos;
     }
-	// TODO: draw line between points with thicklineRGBA()
 }
 
 int main(int argc, char *argv[]) {
@@ -119,7 +138,7 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	TTF_Font *font = TTF_OpenFont("./Fixed-Sys.ttf", 15);
+	TTF_Font *font = TTF_OpenFont("./Fixed-Sys.ttf", 14);
 	
 	SDL_Event event;
 	int quit = 0;
@@ -130,9 +149,11 @@ int main(int argc, char *argv[]) {
 					switch(event.key.keysym.sym) {
 						case SDLK_PERIOD: /* increase the coordinate number spectrume */
 							STEP -= 10;
+							LINE_THICKNESS -= 0.05;
 							break;
 						case SDLK_COMMA: /* reduce the coordinate number spectrume */
 							STEP += 10;
+							LINE_THICKNESS += 0.05;
 							break;
 						default:
 							break;
