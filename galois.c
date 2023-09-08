@@ -23,7 +23,7 @@ double f(double x) {
 void render_number(SDL_Renderer *renderer, TTF_Font *font, int number, int x, int y) {
     SDL_Color textColor = {255, 255, 255};
 
-    char numberText[5];
+    char numberText[16];
     snprintf(numberText, sizeof(numberText), "%d", number);
 
     SDL_Surface *surface = TTF_RenderText_Solid(font, numberText, textColor);
@@ -146,12 +146,12 @@ int main(int argc, char *argv[]) {
 				case SDL_KEYDOWN:
 					switch(event.key.keysym.sym) {
 						case SDLK_MINUS: /* increase the coordinate number spectrume */
-							STEP -= 10;
-							if (LINE_THICKNESS >= 1.0)
+							STEP -= 5;
+							if (LINE_THICKNESS > 1.5)
 								LINE_THICKNESS -= 0.25;
 							break;
 						case SDLK_EQUALS: /* reduce the coordinate number spectrume */
-							STEP += 10;
+							STEP += 5;
 							LINE_THICKNESS += 0.25;
 							break;
 						default:
