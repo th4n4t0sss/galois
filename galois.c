@@ -12,7 +12,7 @@
 /*------------------------- */
 int STEP = 100;
 							/* find better way to declare this variables */
-double LINE_THICKNESS = 2.5;
+double LINE_THICKNESS = 5.0;
 /*------------------------- */
 
 double f(double x) {
@@ -46,14 +46,12 @@ void render_number(SDL_Renderer *renderer, TTF_Font *font, int number, int x, in
     SDL_FreeSurface(surface);
 }
 
-void ploting(SDL_Renderer *renderer, int width, int height, TTF_Font *font) {
-
+void rendering_coordinate_system(SDL_Renderer *renderer, int width, int height, TTF_Font *font) {
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
     SDL_RenderDrawLine(renderer, 
 						0, height / 2, 
 						width, height / 2); /* Drawing horizontal axes line */
-
     SDL_RenderDrawLine(renderer, 
 						width / 2, 0, 
 						width / 2, height); /* Drawing vertical axes line */
@@ -62,6 +60,7 @@ void ploting(SDL_Renderer *renderer, int width, int height, TTF_Font *font) {
 	int x_axes_number = -(width / 2 / STEP); /* valuing start amount of x axes */
 
 	for (int i=0; i<=width; i+=STEP) {
+		/* drawing small lines on axes */
 		SDL_RenderDrawLine(renderer,
 				    i, height / 2 - 2,
 				    i, height / 2 + 2);
@@ -70,18 +69,21 @@ void ploting(SDL_Renderer *renderer, int width, int height, TTF_Font *font) {
 				   width / 2 - 2, i,
 				   width / 2 + 2, i);
 
-		render_number(renderer, font, x_axes_number, i, height / 2);
+		render_number(renderer, font, x_axes_number, i, height / 2); /* rendering numbers on axes */
 		x_axes_number++; 
 	}
+}
+
+void ploting(SDL_Renderer *renderer, int width, int height, TTF_Font *font, double LINE_THICKNESS) {
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); /* color red for dots */
 
     int x_max = width / 2 / STEP; /* should be maximum coordinates for x but i am not sure that this is proper way */
     int y_max = height / 2 / STEP; /* same thing but for y */
-    double step = 1.00; /* TODO: get the step from STEP variable */
+    double step = 1.0; /* TODO: get the step from STEP variable */
 
 	int previous_x_pos = 0;
 	int previous_y_pos = 0;
 
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); /* color red for dots */
 	for (double x = -x_max; x <= x_max; x += step) { /* looping through all the values of x */
         double function = f(x);
         int x_pos = (int)(x * STEP) + width / 2;
@@ -105,7 +107,6 @@ void ploting(SDL_Renderer *renderer, int width, int height, TTF_Font *font) {
 }
 
 int main(int argc, char *argv[]) {
-
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 		fprintf(stderr, "could not initialize sdl2: %s\n", SDL_GetError()) ;
 		return EXIT_FAILURE ;
@@ -146,7 +147,8 @@ int main(int argc, char *argv[]) {
 					switch(event.key.keysym.sym) {
 						case SDLK_PERIOD: /* increase the coordinate number spectrume */
 							STEP -= 10;
-							LINE_THICKNESS -= 0.025;
+							if (LINE_THICKNESS >= 1.0)
+								LINE_THICKNESS -= 0.25;
 							break;
 						case SDLK_COMMA: /* reduce the coordinate number spectrume */
 							STEP += 10;
@@ -169,7 +171,8 @@ int main(int argc, char *argv[]) {
 		int height = SDL_GetWindowSurface(window)->h;
 
 		// printf("width: %d\nheight: %d\n", width, height);
-		ploting(renderer, width, height, font);
+		rendering_coordinate_system(renderer, width, height, font);
+		ploting(renderer, width , height, font, LINE_THICKNESS);
 
 		SDL_RenderPresent(renderer);
 	}
