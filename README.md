@@ -4,5 +4,5 @@
 
 ##
 <p align="center">
-    <img src="http://0x0.st/Hfqx.png" width="500px">
+    <img src="http://0x0.st/Hfqx.png" width="250px">
 </p>
