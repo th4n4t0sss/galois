@@ -7,20 +7,16 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
 
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 800
+#define SCREEN_WIDTH 600
+#define SCREEN_HEIGHT 600
 
-/*------------------------- */
+/* TODO: better way to define this variables */
 int STEP = 100;
-							/* find better way to declare this variables */
 double LINE_THICKNESS = 5.0;
-
 bool show_line = true;
-/*------------------------- */
 
 /* TODO: text prompt for inserting mathematical function */
-
-double f(double x) {
+int f(int x) {
 	return x * x;
 }
 
@@ -56,13 +52,12 @@ void rendering_coordinate_system(SDL_Renderer *renderer, int width, int height, 
 
     SDL_RenderDrawLine(renderer, 
 						0, height / 2, 
-						width, height / 2); /* Drawing horizontal axes line */
+						width, height / 2); /* horizontal axes line */
     SDL_RenderDrawLine(renderer, 
 						width / 2, 0, 
-						width / 2, height); /* Drawing vertical axes line */
+						width / 2, height); /* vertical axes line */
 
-	/* Rendering small lines and numbers on axes */
-	int x_axes_number = -(width / 2 / STEP); /* valuing start amount of x axes */
+	int x_axes_number = -(width / 2 / STEP);
 	int y_axes_number = height / 2 / STEP;
 
 	for (int i=0; i<=width; i+=STEP) {
@@ -75,7 +70,8 @@ void rendering_coordinate_system(SDL_Renderer *renderer, int width, int height, 
 				   width / 2 + 2, i);
 
 		render_number(renderer, font, x_axes_number, i, height / 2); /* rendering numbers on axes */
-		render_number(renderer, font, y_axes_number, width / 2, i); /* rendering numbers on axes */
+		render_number(renderer, font, y_axes_number, width / 2, i);
+
 		x_axes_number++; 
 		y_axes_number--;
 	}
@@ -85,7 +81,7 @@ void ploting(SDL_Renderer *renderer, int width, int height, TTF_Font *font, doub
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); /* color red for dots */
 
     int x_max = width / 2 / STEP; /* should be maximum coordinates for x but i am not sure that this is proper way */
-    int y_max = height / 2 / STEP; /* same thing but for y */
+    int y_max = height / 2 / STEP;
     double step = 1.0; /* TODO: get the step from STEP variable */
 
 	int previous_x_pos = 0;
@@ -93,9 +89,8 @@ void ploting(SDL_Renderer *renderer, int width, int height, TTF_Font *font, doub
 
 	for (double x = -x_max; x <= x_max; x += step) { /* looping through all the values of x */
         double function = f(x);
-        int x_pos = (int)(x * STEP) + width / 2;
-        int y_pos = height / 2 - (int)(function * STEP);
-
+        int x_pos = x * STEP + width / 2;
+        int y_pos = height / 2 - function * STEP;
 
 		if (show_line) {
 			/* TODO: draw line clever way */
@@ -116,6 +111,11 @@ void ploting(SDL_Renderer *renderer, int width, int height, TTF_Font *font, doub
 }
 
 int main(int argc, char *argv[]) {
+	int x_mouse, y_mouse;
+	int width,height;
+
+	int quit = 0;
+
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 		fprintf(stderr, "could not initialize sdl2: %s\n", SDL_GetError()) ;
 		return EXIT_FAILURE ;
@@ -146,22 +146,26 @@ int main(int argc, char *argv[]) {
 	}
 
 	TTF_Font *font = TTF_OpenFont("./fonts/Fixed-Sys.ttf", 14);
-
 	
 	SDL_Event event;
-	int quit = 0;
+	SDL_StartTextInput();
+
 	while (!quit) {
 		while(SDL_PollEvent(&event)) {
 			switch (event.type) {
 				/* TODO: movement with mouse */
+				case SDL_MOUSEBUTTONDOWN:
+					SDL_GetGlobalMouseState(&x_mouse, &y_mouse);
+					printf("%d : %d\n", x_mouse, y_mouse);
+					break;
 				case SDL_KEYDOWN:
 					switch(event.key.keysym.sym) {
-						case SDLK_MINUS: /* increase the coordinate number spectrume */
+						case SDLK_MINUS: /* decrease the coordinate number spectrume */
 							STEP -= 5;
 							if (LINE_THICKNESS > 2.0)
 								LINE_THICKNESS -= 0.15;
 							break;
-						case SDLK_EQUALS: /* reduce the coordinate number spectrume */
+						case SDLK_EQUALS: /* increase the coordinate number spectrume */
 							STEP += 5;
 							LINE_THICKNESS += 0.15;
 							break;
@@ -170,8 +174,17 @@ int main(int argc, char *argv[]) {
 								show_line = false;
 							else show_line = true;
 							break;
+						case SDLK_f:
+							break;	
 						default:
 							break;
+					}
+					break;
+				case SDL_WINDOWEVENT:
+					/* TODO: call rendering_coordinates and ploting functions on window resize */
+					if (event.window.event == SDL_WINDOWEVENT_EXPOSED) {
+						SDL_GetWindowSize(window, &width, &height);
+						printf("%d : %d\n", width, height);
 					}
 					break;
 				case SDL_QUIT:
@@ -183,8 +196,7 @@ int main(int argc, char *argv[]) {
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 		SDL_RenderClear(renderer);
 
-		int width = SDL_GetWindowSurface(window)->w;
-		int height = SDL_GetWindowSurface(window)->h;
+		SDL_GetWindowSize(window, &width, &height);
 
 		rendering_coordinate_system(renderer, width, height, font);
 		ploting(renderer, width , height, font, LINE_THICKNESS);
