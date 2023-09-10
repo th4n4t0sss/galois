@@ -70,12 +70,12 @@ void rendering_coordinate_system(SDL_Renderer *renderer, int width, int height, 
 	else y_axes = height / 2 - y_mouse
 	*/
 	if (y_mouse > height / 2)
-		y_axes = height / 2 + y_mouse;
-	else y_axes = height / 2 - y_mouse;
+		y_axes = height / 2 - y_mouse;
+	else y_axes = height / 2 + y_mouse;
 	
     SDL_RenderDrawLine(renderer, 
-						0, height / 2, 
-						width, height / 2); /* horizontal axes line */
+						0, y_axes,
+						width, y_axes); /* horizontal axes line */
 	if (x_mouse > width / 2)
 		x_axes = width / 2 - x_mouse;
 	else x_axes = width / 2 + x_mouse;
