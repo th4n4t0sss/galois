@@ -81,7 +81,6 @@ void rendering_coordinate_system(SDL_Renderer *renderer, int width, int height, 
 		x_axes = x_mouse - width / 2;
 	else if (x_mouse < width / 2)
 		x_axes = x_mouse + width / 2;
-
 	/*
 	 if mouse_x > widht / 2 then
 		render width / 2 - mouse_x
@@ -188,9 +187,12 @@ int main(int argc, char *argv[]) {
 					sdl_clean_up(window, renderer, font);
 					return EXIT_SUCCESS;
 				/* TODO: movement with mouse */
-				case SDL_MOUSEBUTTONDOWN:
-					SDL_GetMouseState(&x_mouse, &y_mouse);
-					printf("%d : %d\n", x_mouse, y_mouse);
+				case SDL_MOUSEMOTION:
+					// SDL_GetMouseState(&x_mouse, &y_mouse);
+					if (event.button.button == SDL_BUTTON_LEFT) {
+						 printf("Mouse moved by: %d, %d : %d, %d\n", event.motion.xrel, event.motion.yrel, event.motion.x, event.motion.y);
+						 SDL_GetMouseState(&x_mouse, &y_mouse);
+					}
 					break;
 				case SDL_KEYDOWN:
 					switch(event.key.keysym.sym) {
