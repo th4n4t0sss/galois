@@ -182,10 +182,15 @@ int main(int argc, char *argv[]) {
 					break;
 				case SDL_WINDOWEVENT:
 					/* TODO: call rendering_coordinates and ploting functions on window resize */
-					if (event.window.event == SDL_WINDOWEVENT_EXPOSED) {
+					/*if (event.window.event == SDL_WINDOWEVENT_EXPOSED) {
+					    SDL_RenderClear(renderer);
+
 						SDL_GetWindowSize(window, &width, &height);
 						printf("%d : %d\n", width, height);
-					}
+
+						rendering_coordinate_system(renderer, width, height, font);
+						ploting(renderer, width , height, font, LINE_THICKNESS);
+					}*/
 					break;
 				case SDL_QUIT:
 					quit = 1;
@@ -197,10 +202,10 @@ int main(int argc, char *argv[]) {
 		SDL_RenderClear(renderer);
 
 		SDL_GetWindowSize(window, &width, &height);
+		printf("%d : %d\n", width, height);
 
 		rendering_coordinate_system(renderer, width, height, font);
 		ploting(renderer, width , height, font, LINE_THICKNESS);
-
 		SDL_RenderPresent(renderer);
 	}
 
