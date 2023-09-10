@@ -20,6 +20,15 @@ int f(int x) {
 	return x * x;
 }
 
+void sdl_clean_up(SDL_Window *window, SDL_Renderer *renderer, TTF_Font *font) {
+	TTF_CloseFont(font);
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	
+	TTF_Quit();
+	SDL_Quit();
+}
+
 /* rendering number text */
 void render_number(SDL_Renderer *renderer, TTF_Font *font, int number, int x, int y) {
     SDL_Color textColor = {255, 255, 255};
@@ -114,8 +123,6 @@ int main(int argc, char *argv[]) {
 	int x_mouse, y_mouse;
 	int width,height;
 
-	int quit = 0;
-
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 		fprintf(stderr, "could not initialize sdl2: %s\n", SDL_GetError()) ;
 		return EXIT_FAILURE ;
@@ -150,9 +157,12 @@ int main(int argc, char *argv[]) {
 	SDL_Event event;
 	SDL_StartTextInput();
 
-	while (!quit) {
+	while (1) {
 		while(SDL_PollEvent(&event)) {
 			switch (event.type) {
+				case SDL_QUIT:
+					sdl_clean_up(window, renderer, font);
+					return EXIT_SUCCESS;
 				/* TODO: movement with mouse */
 				case SDL_MOUSEBUTTONDOWN:
 					SDL_GetGlobalMouseState(&x_mouse, &y_mouse);
@@ -192,10 +202,8 @@ int main(int argc, char *argv[]) {
 						ploting(renderer, width , height, font, LINE_THICKNESS);
 					}*/
 					break;
-				case SDL_QUIT:
-					quit = 1;
+				default:
 					break;
-				default: {}
 			}
 		}
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -209,11 +217,7 @@ int main(int argc, char *argv[]) {
 		SDL_RenderPresent(renderer);
 	}
 
-	TTF_CloseFont(font);
-	SDL_DestroyWindow(window);
-
-	TTF_Quit();
-	SDL_Quit();
+	sdl_clean_up(window, renderer, font);
 
 	return EXIT_SUCCESS;
 }
