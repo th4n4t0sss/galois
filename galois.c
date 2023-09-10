@@ -15,6 +15,11 @@ int STEP = 100;
 double LINE_THICKNESS = 5.0;
 bool show_line = true;
 
+int x_mouse = 0;
+int y_mouse = 0;
+
+int x_axes = 0;
+int y_axes = 0;
 /* TODO: text prompt for inserting mathematical function */
 int f(int x) {
 	return x * x;
@@ -59,12 +64,31 @@ void render_number(SDL_Renderer *renderer, TTF_Font *font, int number, int x, in
 void rendering_coordinate_system(SDL_Renderer *renderer, int width, int height, TTF_Font *font) {
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
+	/*
+	if y_mouse > height / 2) then
+		y_axes = height / 2 + y_mouse
+	else y_axes = height / 2 - y_mouse
+	*/
+	if (y_mouse > height / 2)
+		y_axes = height / 2 + y_mouse;
+	else y_axes = height / 2 - y_mouse;
+	
     SDL_RenderDrawLine(renderer, 
 						0, height / 2, 
 						width, height / 2); /* horizontal axes line */
+	if (x_mouse > width / 2)
+		x_axes = width / 2 - x_mouse;
+	else x_axes = width / 2 + x_mouse;
+
+	printf("%d\n", x_axes);
+	/*
+	 if mouse_x > widht / 2 then
+		render width / 2 - mouse_x
+	 else render width / 2 + mouse_x
+	 */
     SDL_RenderDrawLine(renderer, 
-						width / 2, 0, 
-						width / 2, height); /* vertical axes line */
+						x_axes, 0, 
+						x_axes, height); /* vertical axes line */
 
 	int x_axes_number = -(width / 2 / STEP);
 	int y_axes_number = height / 2 / STEP;
@@ -120,7 +144,6 @@ void ploting(SDL_Renderer *renderer, int width, int height, TTF_Font *font, doub
 }
 
 int main(int argc, char *argv[]) {
-	int x_mouse, y_mouse;
 	int width,height;
 
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -165,7 +188,7 @@ int main(int argc, char *argv[]) {
 					return EXIT_SUCCESS;
 				/* TODO: movement with mouse */
 				case SDL_MOUSEBUTTONDOWN:
-					SDL_GetGlobalMouseState(&x_mouse, &y_mouse);
+					SDL_GetMouseState(&x_mouse, &y_mouse);
 					printf("%d : %d\n", x_mouse, y_mouse);
 					break;
 				case SDL_KEYDOWN:
@@ -184,7 +207,7 @@ int main(int argc, char *argv[]) {
 								show_line = false;
 							else show_line = true;
 							break;
-						case SDLK_f:
+						case SDLK_f: /* TODO: add text prompt for f(x) function */
 							break;	
 						default:
 							break;
@@ -210,7 +233,6 @@ int main(int argc, char *argv[]) {
 		SDL_RenderClear(renderer);
 
 		SDL_GetWindowSize(window, &width, &height);
-		printf("%d : %d\n", width, height);
 
 		rendering_coordinate_system(renderer, width, height, font);
 		ploting(renderer, width , height, font, LINE_THICKNESS);
