@@ -63,24 +63,25 @@ void render_number(SDL_Renderer *renderer, TTF_Font *font, int number, int x, in
 
 void rendering_coordinate_system(SDL_Renderer *renderer, int width, int height, TTF_Font *font) {
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-
 	/*
 	if y_mouse > height / 2) then
 		y_axes = height / 2 + y_mouse
 	else y_axes = height / 2 - y_mouse
 	*/
 	if (y_mouse > height / 2)
-		y_axes = height / 2 - y_mouse;
-	else y_axes = height / 2 + y_mouse;
+		y_axes = y_mouse - height / 2;
+	else if (y_mouse < height / 2)
+		y_axes = y_mouse + height / 2;
 	
     SDL_RenderDrawLine(renderer, 
 						0, y_axes,
 						width, y_axes); /* horizontal axes line */
-	if (x_mouse > width / 2)
-		x_axes = width / 2 - x_mouse;
-	else x_axes = width / 2 + x_mouse;
 
-	printf("%d\n", x_axes);
+	if (x_mouse > width / 2)
+		x_axes = x_mouse - width / 2;
+	else if (x_mouse < width / 2)
+		x_axes = x_mouse + width / 2;
+
 	/*
 	 if mouse_x > widht / 2 then
 		render width / 2 - mouse_x
