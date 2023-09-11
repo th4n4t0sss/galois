@@ -95,8 +95,8 @@ void rendering_coordinate_system(SDL_Renderer *renderer, int width, int height, 
 				   x_axes - 2, i,
 				   x_axes + 2, i);
 
-		render_number(renderer, font, x_axes_number, i, height / 2); /* rendering numbers on axes */
-		render_number(renderer, font, y_axes_number, width / 2, i);
+		render_number(renderer, font, x_axes_number, i, y_axes); /* rendering numbers on axes */
+		render_number(renderer, font, y_axes_number, x_axes, i);
 
 		x_axes_number++; 
 		y_axes_number--;
@@ -179,13 +179,11 @@ int main(int argc, char *argv[]) {
 				case SDL_QUIT:
 					sdl_clean_up(window, renderer, font);
 					return EXIT_SUCCESS;
-				/* TODO: movement with mouse */
 				case SDL_MOUSEMOTION:
-					// SDL_GetMouseState(&x_mouse, &y_mouse);
-					if (event.button.button == SDL_BUTTON_LEFT) {
+					/* TODO: find better way to declare this */	
+					if (event.button.button == SDL_BUTTON_LEFT && event.motion.state) {
 						x_mouse = event.motion.xrel; 
 						y_mouse = event.motion.yrel;
-						//printf("%d : %d = %d : %d\n", x_mouse, y_mouse, event.motion.xrel, event.motion.yrel);
 					} else {
 						x_mouse = 0;
 						y_mouse = 0;
