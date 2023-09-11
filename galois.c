@@ -186,6 +186,9 @@ int main(int argc, char *argv[]) {
 						x_mouse = event.motion.xrel; 
 						y_mouse = event.motion.yrel;
 						//printf("%d : %d = %d : %d\n", x_mouse, y_mouse, event.motion.xrel, event.motion.yrel);
+					} else {
+						x_mouse = 0;
+						y_mouse = 0;
 					}
 					break;
 				case SDL_KEYDOWN:
