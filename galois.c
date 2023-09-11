@@ -18,8 +18,8 @@ bool show_line = true;
 int x_mouse = 0;
 int y_mouse = 0;
 
-int x_axes = 0;
-int y_axes = 0;
+int x_axes = 300;
+int y_axes = 300;
 /* TODO: text prompt for inserting mathematical function */
 int f(int x) {
 	return x * x;
@@ -68,24 +68,17 @@ void rendering_coordinate_system(SDL_Renderer *renderer, int width, int height, 
 		y_axes = height / 2 + y_mouse
 	else y_axes = height / 2 - y_mouse
 	*/
-	if (y_mouse > height / 2)
-		y_axes = y_mouse - height / 2;
-	else if (y_mouse < height / 2)
-		y_axes = y_mouse + height / 2;
-	
+	y_axes += y_mouse;
     SDL_RenderDrawLine(renderer, 
 						0, y_axes,
 						width, y_axes); /* horizontal axes line */
-
-	if (x_mouse > width / 2)
-		x_axes = x_mouse - width / 2;
-	else if (x_mouse < width / 2)
-		x_axes = x_mouse + width / 2;
 	/*
 	 if mouse_x > widht / 2 then
 		render width / 2 - mouse_x
 	 else render width / 2 + mouse_x
 	 */
+	x_axes += x_mouse;
+	printf("%d : %d\n", x_mouse, x_axes);
     SDL_RenderDrawLine(renderer, 
 						x_axes, 0, 
 						x_axes, height); /* vertical axes line */
@@ -95,12 +88,12 @@ void rendering_coordinate_system(SDL_Renderer *renderer, int width, int height, 
 
 	for (int i=0; i<=width; i+=STEP) {
 		SDL_RenderDrawLine(renderer,
-				    i, height / 2 - 2,
-				    i, height / 2 + 2);
+				    i, y_axes - 2,
+				    i, y_axes + 2);
 
 		SDL_RenderDrawLine(renderer,
-				   width / 2 - 2, i,
-				   width / 2 + 2, i);
+				   x_axes - 2, i,
+				   x_axes + 2, i);
 
 		render_number(renderer, font, x_axes_number, i, height / 2); /* rendering numbers on axes */
 		render_number(renderer, font, y_axes_number, width / 2, i);
@@ -190,8 +183,9 @@ int main(int argc, char *argv[]) {
 				case SDL_MOUSEMOTION:
 					// SDL_GetMouseState(&x_mouse, &y_mouse);
 					if (event.button.button == SDL_BUTTON_LEFT) {
-						 printf("Mouse moved by: %d, %d : %d, %d\n", event.motion.xrel, event.motion.yrel, event.motion.x, event.motion.y);
-						 SDL_GetMouseState(&x_mouse, &y_mouse);
+						x_mouse = event.motion.xrel; 
+						y_mouse = event.motion.yrel;
+						//printf("%d : %d = %d : %d\n", x_mouse, y_mouse, event.motion.xrel, event.motion.yrel);
 					}
 					break;
 				case SDL_KEYDOWN:
