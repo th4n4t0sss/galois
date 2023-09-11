@@ -83,8 +83,8 @@ void rendering_coordinate_system(SDL_Renderer *renderer, int width, int height, 
 						x_axes, 0, 
 						x_axes, height); /* vertical axes line */
 
-	int x_axes_number = -(width / 2 / STEP);
-	int y_axes_number = height / 2 / STEP;
+	int x_axes_number = -(x_axes / STEP);
+	int y_axes_number = y_axes / STEP;
 
 	for (int i=0; i<=width; i+=STEP) {
 		SDL_RenderDrawLine(renderer,
@@ -95,7 +95,8 @@ void rendering_coordinate_system(SDL_Renderer *renderer, int width, int height, 
 				   x_axes - 2, i,
 				   x_axes + 2, i);
 
-		render_number(renderer, font, x_axes_number, i, y_axes); /* rendering numbers on axes */
+		/* rendering numbers on axes */
+		render_number(renderer, font, x_axes_number, i, y_axes);
 		render_number(renderer, font, y_axes_number, x_axes, i);
 
 		x_axes_number++; 
@@ -106,8 +107,8 @@ void rendering_coordinate_system(SDL_Renderer *renderer, int width, int height, 
 void ploting(SDL_Renderer *renderer, int width, int height, TTF_Font *font, double LINE_THICKNESS) {
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); /* color red for dots */
 
-    int x_max = width / 2 / STEP; /* should be maximum coordinates for x but i am not sure that this is proper way */
-    int y_max = height / 2 / STEP;
+    int x_max = y_axes / STEP; /* should be maximum coordinates for x but i am not sure that this is proper way */
+    int y_max = x_axes / STEP;
     double step = 1.0; /* TODO: get the step from STEP variable */
 
 	int previous_x_pos = 0;
@@ -115,8 +116,8 @@ void ploting(SDL_Renderer *renderer, int width, int height, TTF_Font *font, doub
 
 	for (double x = -x_max; x <= x_max; x += step) { /* looping through all the values of x */
         double function = f(x);
-        int x_pos = x * STEP + width / 2;
-        int y_pos = height / 2 - function * STEP;
+        int x_pos = x * STEP + x_axes;
+        int y_pos = y_axes - function * STEP;
 
 		if (show_line) {
 			/* TODO: draw line clever way */
