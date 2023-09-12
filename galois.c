@@ -22,7 +22,7 @@ int x_axes = 300;
 int y_axes = 300;
 /* TODO: text prompt for inserting mathematical function */
 int f(int x) {
-	return x * x;
+	return x;
 }
 
 void sdl_clean_up(SDL_Window *window, SDL_Renderer *renderer, TTF_Font *font) {
@@ -125,15 +125,18 @@ void ploting(SDL_Renderer *renderer, int width, int height, TTF_Font *font, doub
 						  previous_x_pos, previous_y_pos,
 						  x_pos, y_pos,
 						  LINE_THICKNESS,
-						  255,
-						  0,
-						  0,
-						  255);
+						  255, 0, 0, 255);
 
 			previous_x_pos = x_pos;
 			previous_y_pos = y_pos;
-		} else 
-			SDL_RenderDrawPoint(renderer, x_pos, y_pos);
+		} else {
+			thickLineRGBA(renderer,
+						  x_pos, y_pos,
+						  x_pos,y_pos,
+						  LINE_THICKNESS,
+						  255, 0, 0, 255);
+		}
+		
     }
 }
 
@@ -154,6 +157,8 @@ int main(int argc, char *argv[]) {
 						SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,
 						SCREEN_WIDTH, SCREEN_HEIGHT,
 						SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN);
+
+	SDL_GetWindowSize(window, &width, &height);
 
 	if (window == NULL) {
 		fprintf(stderr, "could not initialize window: %s\n", SDL_GetError()) ;
