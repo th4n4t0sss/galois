@@ -71,7 +71,6 @@ void rendering_coordinate_system(SDL_Renderer *renderer, int width, int height, 
 		y_axes = height / 2 + y_mouse
 	else y_axes = height / 2 - y_mouse
 	*/
-	y_axes += y_mouse;
     SDL_RenderDrawLine(renderer, 
 						0, y_axes,
 						width, y_axes); /* horizontal axes line */
@@ -80,7 +79,6 @@ void rendering_coordinate_system(SDL_Renderer *renderer, int width, int height, 
 		render width / 2 - mouse_x
 	 else render width / 2 + mouse_x
 	 */
-	x_axes += x_mouse;
     SDL_RenderDrawLine(renderer, 
 						x_axes, 0, 
 						x_axes, height); /* vertical axes line */
@@ -109,8 +107,8 @@ void rendering_coordinate_system(SDL_Renderer *renderer, int width, int height, 
 void ploting(SDL_Renderer *renderer, int width, int height, TTF_Font *font, double LINE_THICKNESS) {
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); /* color red for dots */
 
-    int x_max = x_axes / STEP; /* should be maximum coordinates for x but i am not sure that this is proper way */
-    int y_max = y_axes / STEP;
+    int x_max = y_axes / STEP; /* should be maximum coordinates for x but i am not sure that this is proper way */
+    int y_max = -(x_axes / STEP);
     double step = 1.0; /* TODO: get the step from STEP variable */
 
 
@@ -191,12 +189,9 @@ int main(int argc, char *argv[]) {
 					return EXIT_SUCCESS;
 				case SDL_MOUSEMOTION:
 					/* TODO: find better way to declare this */	
-					if (event.motion.state && event.button.button == SDL_BUTTON_LEFT) {
-						x_mouse = event.motion.xrel; 
-						y_mouse = event.motion.yrel;
-					} else {
-						x_mouse = 0;
-						y_mouse = 0;
+					if (event.button.button == SDL_BUTTON_LEFT) {
+						x_axes += event.motion.xrel; 
+						y_axes += event.motion.yrel;
 					}
 					break;
 				case SDL_KEYDOWN:
