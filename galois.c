@@ -20,8 +20,11 @@ int y_mouse = 0;
 
 int x_axes = 300;
 int y_axes = 300;
+
+int previous_x_pos = 0;
+int previous_y_pos = 0;
 /* TODO: text prompt for inserting mathematical function */
-int f(int x) {
+double f(double x) {
 	return x;
 }
 
@@ -78,7 +81,6 @@ void rendering_coordinate_system(SDL_Renderer *renderer, int width, int height, 
 	 else render width / 2 + mouse_x
 	 */
 	x_axes += x_mouse;
-	printf("%d : %d\n", x_mouse, x_axes);
     SDL_RenderDrawLine(renderer, 
 						x_axes, 0, 
 						x_axes, height); /* vertical axes line */
@@ -107,12 +109,10 @@ void rendering_coordinate_system(SDL_Renderer *renderer, int width, int height, 
 void ploting(SDL_Renderer *renderer, int width, int height, TTF_Font *font, double LINE_THICKNESS) {
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); /* color red for dots */
 
-    int x_max = y_axes / STEP; /* should be maximum coordinates for x but i am not sure that this is proper way */
-    int y_max = x_axes / STEP;
+    int x_max = x_axes / STEP; /* should be maximum coordinates for x but i am not sure that this is proper way */
+    int y_max = y_axes / STEP;
     double step = 1.0; /* TODO: get the step from STEP variable */
 
-	int previous_x_pos = 0;
-	int previous_y_pos = 0;
 
 	for (double x = -x_max; x <= x_max; x += step) { /* looping through all the values of x */
         double function = f(x);
@@ -130,6 +130,7 @@ void ploting(SDL_Renderer *renderer, int width, int height, TTF_Font *font, doub
 			previous_x_pos = x_pos;
 			previous_y_pos = y_pos;
 		} else {
+			/* drawing thick dot but because SDL_DrawPoint doesn't have point thickness argument */
 			thickLineRGBA(renderer,
 						  x_pos, y_pos,
 						  x_pos,y_pos,
@@ -142,6 +143,9 @@ void ploting(SDL_Renderer *renderer, int width, int height, TTF_Font *font, doub
 
 int main(int argc, char *argv[]) {
 	int width,height;
+
+	int old_x_mouse = 0;
+	int old_y_mouse = 0;
 
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 		fprintf(stderr, "could not initialize sdl2: %s\n", SDL_GetError()) ;
@@ -187,7 +191,7 @@ int main(int argc, char *argv[]) {
 					return EXIT_SUCCESS;
 				case SDL_MOUSEMOTION:
 					/* TODO: find better way to declare this */	
-					if (event.button.button == SDL_BUTTON_LEFT && event.motion.state) {
+					if (event.motion.state && event.button.button == SDL_BUTTON_LEFT) {
 						x_mouse = event.motion.xrel; 
 						y_mouse = event.motion.yrel;
 					} else {
