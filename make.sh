@@ -1,10 +1,9 @@
-#!/bin/sh
-set -xe
+#!/bin/sh -ex
 
-CC="${CXX:-cc}"
-PKGS="sdl2"
-CFLAGS="-Wall -Wextra -std=c11 -pedantic -ggdb"
-LIBS="-lm -lSDL2_ttf -lSDL2_gfx"
+CC="${CC:-cc}"
+PKGS="sdl2 SDL2_ttf SDL2_gfx"
+CFLAGS="-Wall -Wextra -std=c11 -pedantic -ggdb `pkg-config --cflags $PKGS`"
+LIBS="-lm `pkg-config --libs $PKGS`"
 SRC="galois.c"
 
-$CC $CFLAGS `pkg-config --cflags $PKGS` -o galois $SRC $LIBS `pkg-config --libs $PKGS`
+$CC $CFLAGS -o galois $SRC $LIBS
