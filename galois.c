@@ -100,11 +100,11 @@ void plotting(SDL_Renderer *renderer, int width, double LINE_THICKNESS) {
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); /* color red for dots */
 
     int x_max = width / STEP; /* should be maximum coordinates for x but i am not sure that this is proper way */
-    double step = 1.0; /* TODO: get the step from STEP variable */
-
+    double step = 0.1; /* TODO: get the step from STEP variable */
 
 	for (double x = -x_max; x <= x_max; x += step) { /* looping through all the values of x */
         double function = f(x);
+		printf("%lf\n", f(x));
         int x_pos = x * STEP + x_axes;
         int y_pos = y_axes - function * STEP;
 
