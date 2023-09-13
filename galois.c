@@ -22,9 +22,6 @@ int y_mouse = 0;
 
 int x_axes, y_axes;
 
-int previous_x_pos = 0;
-int previous_y_pos = 0;
-
 /* TODO: text prompt for inserting mathematical function */
 double f(double x) {
 	return x * x;
@@ -40,8 +37,7 @@ void sdl_clean_up(SDL_Window *window, SDL_Renderer *renderer, TTF_Font *font) {
 }
 
 /* rendering number text */
-void render_number(SDL_Renderer *renderer, TTF_Font *font, int number, int x, int y) {
-    SDL_Color textColor = {255, 255, 255, 255};
+void render_number(SDL_Renderer *renderer, TTF_Font *font, int number, int x, int y) { SDL_Color textColor = {255, 255, 255, 255};
 
     char numberText[16];
     snprintf(numberText, sizeof(numberText), "%d", number);
@@ -80,17 +76,18 @@ void rendering_coordinates(SDL_Renderer *renderer, int width, int height, TTF_Fo
 	int x_axes_number = -(x_axes / STEP);
 	int y_axes_number = y_axes / STEP;
 
-	for (int i=0; i<=width; i+=STEP) {
+	// ???
+	for (int i=-width; i<=width; i+=STEP) {
 		SDL_RenderDrawLine(renderer,
-				    i, y_axes - 2,
-				    i, y_axes + 2);
+				    x_axes + i, y_axes - 2,
+				    x_axes + i, y_axes + 2);
 
 		SDL_RenderDrawLine(renderer,
 				   x_axes - 2, i,
 				   x_axes + 2, i);
 
 		/* rendering numbers on axes */
-		render_number(renderer, font, x_axes_number, i, y_axes);
+		render_number(renderer, font, x_axes_number, x_axes + i, y_axes);
 		render_number(renderer, font, y_axes_number, x_axes, i);
 
 		x_axes_number++;
@@ -103,6 +100,10 @@ void plotting(SDL_Renderer *renderer, int width, double LINE_THICKNESS) {
 
     int x_max = width / STEP; /* should be maximum coordinates for x but i am not sure that this is proper way */
 
+	int previous_x_pos = 0;
+	int previous_y_pos = 0;
+
+	bool draw_line = false;
 	for (double x = -x_max; x <= x_max; x += step) { /* looping through all the values of x */
         double function = f(x);
 		
@@ -111,14 +112,17 @@ void plotting(SDL_Renderer *renderer, int width, double LINE_THICKNESS) {
 
 		if (SHOW_LINE) {
 			/* TODO: draw line clever way */
-			thickLineRGBA(renderer,
-						  previous_x_pos, previous_y_pos,
-						  x_pos, y_pos,
-						  LINE_THICKNESS,
-						  255, 0, 0, 255);
+			if (draw_line) {
+				thickLineRGBA(renderer,
+								previous_x_pos, previous_y_pos,
+								x_pos, y_pos,
+								LINE_THICKNESS,
+								255, 0, 0, 255);
+			}
 
 			previous_x_pos = x_pos;
 			previous_y_pos = y_pos;
+			draw_line = true;
 		} else {
 			/* drawing thick dot but because SDL_DrawPoint doesn't have point thickness argument */
 			thickLineRGBA(renderer,
@@ -167,7 +171,7 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	TTF_Font *font = TTF_OpenFont("./fonts/Fixed-Sys.ttf", 17);
+	TTF_Font *font = TTF_OpenFont("./fonts/TerminalVector.ttf", 10);
 
 	SDL_Event event;
 	SDL_StartTextInput();
@@ -180,7 +184,7 @@ int main(int argc, char *argv[]) {
 					return EXIT_SUCCESS;
 				case SDL_MOUSEMOTION:
 					/* TODO: find better way to declare this */
-					if (event.button.button == SDL_BUTTON_LEFT) {
+					if (event.motion.state & SDL_BUTTON_LMASK) {
 						x_axes += event.motion.xrel;
 						y_axes += event.motion.yrel;
 					}
@@ -199,9 +203,7 @@ int main(int argc, char *argv[]) {
 								LINE_THICKNESS += 0.15;
 							break;
 						case SDLK_l: /* toggle line drawing on "l" */
-							if (SHOW_LINE)
-								SHOW_LINE = false;
-							else SHOW_LINE = true;
+							SHOW_LINE = !SHOW_LINE;
 							break;
 						case SDLK_f: /* TODO: add text prompt for f(x) function */
 							break;
