@@ -14,7 +14,7 @@
 int STEP = 100;
 double step = 0.1; /* TODO: get the step from STEP variable */
 
-double LINE_THICKNESS = 4.0;
+double LINE_THICKNESS = 3.0;
 bool SHOW_LINE = true;
 
 int x_mouse = 0;
@@ -195,7 +195,8 @@ int main(int argc, char *argv[]) {
 							break;
 						case SDLK_EQUALS: /* increase the coordinate number spectrume */
 							STEP += 5;
-							LINE_THICKNESS += 0.15;
+							if (LINE_THICKNESS < 6.0)
+								LINE_THICKNESS += 0.15;
 							break;
 						case SDLK_l: /* toggle line drawing on "l" */
 							if (SHOW_LINE)
