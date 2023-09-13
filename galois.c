@@ -18,15 +18,14 @@ bool SHOW_LINE = true;
 int x_mouse = 0;
 int y_mouse = 0;
 
-int x_axes = 0;
-int y_axes = 0;
+int x_axes, y_axes;
 
 int previous_x_pos = 0;
 int previous_y_pos = 0;
 
 /* TODO: text prompt for inserting mathematical function */
 double f(double x) {
-	return x;
+	return x * x;
 }
 
 void sdl_clean_up(SDL_Window *window, SDL_Renderer *renderer, TTF_Font *font) {
@@ -210,8 +209,10 @@ int main(int argc, char *argv[]) {
 					}
 					break;
 				case SDL_WINDOWEVENT:
-					x_axes = width / 2;
-					y_axes = height / 2;
+					if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
+						x_axes = width / 2;
+						y_axes = height / 2;
+					}
 					/* TODO: call rendering_coordinates and ploting functions on window resize */
 					/*if (event.window.event == SDL_WINDOWEVENT_EXPOSED) {
 					    SDL_RenderClear(renderer);
