@@ -33,7 +33,7 @@ void sdl_clean_up(SDL_Window *window, SDL_Renderer *renderer, TTF_Font *font) {
 	TTF_CloseFont(font);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
-	
+
 	TTF_Quit();
 	SDL_Quit();
 }
@@ -68,12 +68,12 @@ void render_number(SDL_Renderer *renderer, TTF_Font *font, int number, int x, in
 void rendering_coordinates(SDL_Renderer *renderer, int width, int height, TTF_Font *font) {
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-    SDL_RenderDrawLine(renderer, 
+    SDL_RenderDrawLine(renderer,
 						0, y_axes,
 						width, y_axes); /* horizontal axes line */
 
-    SDL_RenderDrawLine(renderer, 
-						x_axes, 0, 
+    SDL_RenderDrawLine(renderer,
+						x_axes, 0,
 						x_axes, height); /* vertical axes line */
 
 	int x_axes_number = -(x_axes / STEP);
@@ -92,7 +92,7 @@ void rendering_coordinates(SDL_Renderer *renderer, int width, int height, TTF_Fo
 		render_number(renderer, font, x_axes_number, i, y_axes);
 		render_number(renderer, font, y_axes_number, x_axes, i);
 
-		x_axes_number++; 
+		x_axes_number++;
 		y_axes_number--;
 	}
 }
@@ -127,7 +127,7 @@ void plotting(SDL_Renderer *renderer, int width, double LINE_THICKNESS) {
 						  LINE_THICKNESS,
 						  255, 0, 0, 255);
 		}
-		
+
     }
 }
 
@@ -143,7 +143,7 @@ int main(int argc, char *argv[]) {
 		fprintf(stderr, "could not initialize TTF: %s\n", SDL_GetError()) ;
 		return EXIT_FAILURE ;
 	}
-	
+
 	SDL_Window *window = SDL_CreateWindow("Galois",
 						SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,
 						SCREEN_WIDTH, SCREEN_HEIGHT,
@@ -158,18 +158,18 @@ int main(int argc, char *argv[]) {
 		fprintf(stderr, "could not initialize window: %s\n", SDL_GetError()) ;
 		return EXIT_FAILURE;
 	}
-	
+
 	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1,
 						     SDL_RENDERER_ACCELERATED |
 						     SDL_RENDERER_PRESENTVSYNC);
 	if (renderer == NULL) {
 		SDL_DestroyWindow(window);
-		fprintf(stderr, "could not initialize renderer: %s\n", SDL_GetError()) ; 
+		fprintf(stderr, "could not initialize renderer: %s\n", SDL_GetError()) ;
 		return EXIT_FAILURE;
 	}
 
 	TTF_Font *font = TTF_OpenFont("./fonts/Fixed-Sys.ttf", 17);
-	
+
 	SDL_Event event;
 	SDL_StartTextInput();
 
@@ -180,9 +180,9 @@ int main(int argc, char *argv[]) {
 					sdl_clean_up(window, renderer, font);
 					return EXIT_SUCCESS;
 				case SDL_MOUSEMOTION:
-					/* TODO: find better way to declare this */	
+					/* TODO: find better way to declare this */
 					if (event.button.button == SDL_BUTTON_LEFT) {
-						x_axes += event.motion.xrel; 
+						x_axes += event.motion.xrel;
 						y_axes += event.motion.yrel;
 					}
 					break;
@@ -199,17 +199,19 @@ int main(int argc, char *argv[]) {
 							LINE_THICKNESS += 0.15;
 							break;
 						case SDLK_l: /* toggle line drawing on "l" */
-							if (SHOW_LINE) 
+							if (SHOW_LINE)
 								SHOW_LINE = false;
 							else SHOW_LINE = true;
 							break;
 						case SDLK_f: /* TODO: add text prompt for f(x) function */
-							break;	
+							break;
 						default:
 							break;
 					}
 					break;
 				case SDL_WINDOWEVENT:
+					x_axes = width / 2;
+					y_axes = height / 2;
 					/* TODO: call rendering_coordinates and ploting functions on window resize */
 					/*if (event.window.event == SDL_WINDOWEVENT_EXPOSED) {
 					    SDL_RenderClear(renderer);
@@ -229,7 +231,7 @@ int main(int argc, char *argv[]) {
 		SDL_RenderClear(renderer);
 
 		SDL_GetWindowSize(window, &width, &height);
-		
+
 		rendering_coordinates(renderer, width, height, font);
 		plotting(renderer, width, LINE_THICKNESS);
 
