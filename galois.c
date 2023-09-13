@@ -171,7 +171,7 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	TTF_Font *font = TTF_OpenFont("./fonts/TerminalVector.ttf", 10);
+	TTF_Font *font = TTF_OpenFont("./fonts/terminalvector.ttf", 10);
 
 	SDL_Event event;
 	SDL_StartTextInput();

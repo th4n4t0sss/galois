@@ -1,4 +1,4 @@
-#!/bin/sh -ex
+#!/bin/sh -xe
 
 CC="${CC:-cc}"
 PKGS="sdl2 SDL2_ttf SDL2_gfx"
