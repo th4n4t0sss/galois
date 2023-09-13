@@ -12,7 +12,9 @@
 
 /* TODO: better way to define this variables */
 int STEP = 100;
-double LINE_THICKNESS = 5.0;
+double step = 0.1; /* TODO: get the step from STEP variable */
+
+double LINE_THICKNESS = 4.0;
 bool SHOW_LINE = true;
 
 int x_mouse = 0;
@@ -100,11 +102,10 @@ void plotting(SDL_Renderer *renderer, int width, double LINE_THICKNESS) {
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); /* color red for dots */
 
     int x_max = width / STEP; /* should be maximum coordinates for x but i am not sure that this is proper way */
-    double step = 0.1; /* TODO: get the step from STEP variable */
 
 	for (double x = -x_max; x <= x_max; x += step) { /* looping through all the values of x */
         double function = f(x);
-		printf("%lf\n", f(x));
+		
         int x_pos = x * STEP + x_axes;
         int y_pos = y_axes - function * STEP;
 
@@ -126,7 +127,6 @@ void plotting(SDL_Renderer *renderer, int width, double LINE_THICKNESS) {
 						  LINE_THICKNESS,
 						  255, 0, 0, 255);
 		}
-
     }
 }
 
@@ -190,7 +190,7 @@ int main(int argc, char *argv[]) {
 						case SDLK_MINUS: /* decrease the coordinate number spectrume */
 							if (STEP > 1.0)
 								STEP -= 5;
-							if (LINE_THICKNESS > 4.0)
+							if (LINE_THICKNESS > 2.0)
 								LINE_THICKNESS -= 0.15;
 							break;
 						case SDLK_EQUALS: /* increase the coordinate number spectrume */
