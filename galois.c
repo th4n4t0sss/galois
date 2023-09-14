@@ -14,8 +14,8 @@
 int STEP = 100;
 double step = 0.1; /* TODO: get the step from STEP variable */
 
-double LINE_THICKNESS = 3.0;
-bool SHOW_LINE = true;
+double line_thicnkess = 3.0;
+bool show_line = true;
 
 int x_mouse = 0;
 int y_mouse = 0;
@@ -24,7 +24,7 @@ int x_axes, y_axes;
 
 /* TODO: text prompt for inserting mathematical function */
 double f(double x) {
-	return x * x;
+	return x;
 }
 
 void sdl_clean_up(SDL_Window *window, SDL_Renderer *renderer, TTF_Font *font) {
@@ -63,18 +63,18 @@ void render_number(SDL_Renderer *renderer, TTF_Font *font, int number, int x, in
 }
 
 void rendering_coordinates(SDL_Renderer *renderer, int width, int height, TTF_Font *font) {
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-    SDL_RenderDrawLine(renderer,
+	SDL_RenderDrawLine(renderer,
 						0, y_axes,
 						width, y_axes); /* horizontal axes line */
 
-    SDL_RenderDrawLine(renderer,
+	SDL_RenderDrawLine(renderer,
 						x_axes, 0,
 						x_axes, height); /* vertical axes line */
 
-	int x_axes_number = -(x_axes / STEP);
-	int y_axes_number = y_axes / STEP;
+	int x_axes_number = -(width / STEP);
+	int y_axes_number = height / STEP;
 
 	// ???
 	for (int i=-width; i<=width; i+=STEP) {
@@ -83,22 +83,22 @@ void rendering_coordinates(SDL_Renderer *renderer, int width, int height, TTF_Fo
 				    x_axes + i, y_axes + 2);
 
 		SDL_RenderDrawLine(renderer,
-				   x_axes - 2, i,
-				   x_axes + 2, i);
+				   x_axes - 2, y_axes + i,
+				   x_axes + 2, y_axes + i);
 
 		/* rendering numbers on axes */
 		render_number(renderer, font, x_axes_number, x_axes + i, y_axes);
-		render_number(renderer, font, y_axes_number, x_axes, i);
+		render_number(renderer, font, y_axes_number, x_axes, y_axes + i);
 
 		x_axes_number++;
 		y_axes_number--;
 	}
 }
 
-void plotting(SDL_Renderer *renderer, int width, double LINE_THICKNESS) {
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); /* color red for dots */
+void plotting(SDL_Renderer *renderer, int width, double line_thicnkess) {
+	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); /* color red for dots */
 
-    int x_max = width / STEP; /* should be maximum coordinates for x but i am not sure that this is proper way */
+	int x_max = width / STEP; /* should be maximum coordinates for x but i am not sure that this is proper way */
 
 	int previous_x_pos = 0;
 	int previous_y_pos = 0;
@@ -110,13 +110,13 @@ void plotting(SDL_Renderer *renderer, int width, double LINE_THICKNESS) {
         int x_pos = x * STEP + x_axes;
         int y_pos = y_axes - function * STEP;
 
-		if (SHOW_LINE) {
+		if (show_line) {
 			/* TODO: draw line clever way */
 			if (draw_line) {
 				thickLineRGBA(renderer,
 								previous_x_pos, previous_y_pos,
 								x_pos, y_pos,
-								LINE_THICKNESS,
+								line_thicnkess,
 								255, 0, 0, 255);
 			}
 
@@ -128,7 +128,7 @@ void plotting(SDL_Renderer *renderer, int width, double LINE_THICKNESS) {
 			thickLineRGBA(renderer,
 						  x_pos, y_pos,
 						  x_pos,y_pos,
-						  LINE_THICKNESS,
+						  line_thicnkess,
 						  255, 0, 0, 255);
 		}
     }
@@ -172,6 +172,11 @@ int main(int argc, char *argv[]) {
 	}
 
 	TTF_Font *font = TTF_OpenFont("./fonts/terminalvector.ttf", 10);
+	if (font == NULL) {
+		sdl_clean_up(window, renderer, font);
+		fprintf(stderr, "font not found: %s\n", SDL_GetError()) ;
+		return EXIT_FAILURE;
+	}
 
 	SDL_Event event;
 	SDL_StartTextInput();
@@ -194,16 +199,20 @@ int main(int argc, char *argv[]) {
 						case SDLK_MINUS: /* decrease the coordinate number spectrume */
 							if (STEP > 1.0)
 								STEP -= 5;
-							if (LINE_THICKNESS > 2.0)
-								LINE_THICKNESS -= 0.15;
+							if (line_thicnkess > 2.0)
+								line_thicnkess -= 0.15;
 							break;
 						case SDLK_EQUALS: /* increase the coordinate number spectrume */
 							STEP += 5;
-							if (LINE_THICKNESS < 6.0)
-								LINE_THICKNESS += 0.15;
+							if (line_thicnkess < 6.0)
+								line_thicnkess += 0.15;
+							break;
+						case SDLK_0:
+							x_axes = width / 2;
+							y_axes = height / 2;
 							break;
 						case SDLK_l: /* toggle line drawing on "l" */
-							SHOW_LINE = !SHOW_LINE;
+							show_line = !show_line;
 							break;
 						case SDLK_f: /* TODO: add text prompt for f(x) function */
 							break;
@@ -215,6 +224,7 @@ int main(int argc, char *argv[]) {
 					if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
 						x_axes = width / 2;
 						y_axes = height / 2;
+
 					}
 					/* TODO: call rendering_coordinates and ploting functions on window resize */
 					/*if (event.window.event == SDL_WINDOWEVENT_EXPOSED) {
@@ -237,7 +247,7 @@ int main(int argc, char *argv[]) {
 		SDL_GetWindowSize(window, &width, &height);
 
 		rendering_coordinates(renderer, width, height, font);
-		plotting(renderer, width, LINE_THICKNESS);
+		plotting(renderer, width, line_thicnkess);
 
 		SDL_RenderPresent(renderer);
 	}
