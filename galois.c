@@ -11,8 +11,8 @@
 #define SCREEN_HEIGHT 600
 
 /* TODO: better way to define this variables */
-int STEP = 100;
-double step = 0.1; /* TODO: get the step from STEP variable */
+int STEP = 50;
+double plotting_step = 0.1; /* TODO: get the step from STEP variable */
 
 double line_thicnkess = 3.0;
 bool show_line = true;
@@ -24,7 +24,7 @@ int x_axes, y_axes;
 
 /* TODO: text prompt for inserting mathematical function */
 double f(double x) {
-	return x;
+	return x * x;
 }
 
 void sdl_clean_up(SDL_Window *window, SDL_Renderer *renderer, TTF_Font *font) {
@@ -36,8 +36,13 @@ void sdl_clean_up(SDL_Window *window, SDL_Renderer *renderer, TTF_Font *font) {
 	SDL_Quit();
 }
 
+void check_mouse_hover(void) {
+	/* TODO: implement this function */
+}
+
 /* rendering number text */
-void render_number(SDL_Renderer *renderer, TTF_Font *font, int number, int x, int y) { SDL_Color textColor = {255, 255, 255, 255};
+void render_number(SDL_Renderer *renderer, TTF_Font *font, int number, int x, int y) { 
+	SDL_Color textColor = {255, 255, 255, 255};
 
     char numberText[16];
     snprintf(numberText, sizeof(numberText), "%d", number);
@@ -62,39 +67,6 @@ void render_number(SDL_Renderer *renderer, TTF_Font *font, int number, int x, in
     SDL_FreeSurface(surface);
 }
 
-void rendering_coordinates(SDL_Renderer *renderer, int width, int height, TTF_Font *font) {
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-
-	SDL_RenderDrawLine(renderer,
-						0, y_axes,
-						width, y_axes); /* horizontal axes line */
-
-	SDL_RenderDrawLine(renderer,
-						x_axes, 0,
-						x_axes, height); /* vertical axes line */
-
-	int x_axes_number = -(width / STEP);
-	int y_axes_number = height / STEP;
-
-	// ???
-	for (int i=-width; i<=width; i+=STEP) {
-		SDL_RenderDrawLine(renderer,
-				    x_axes + i, y_axes - 2,
-				    x_axes + i, y_axes + 2);
-
-		SDL_RenderDrawLine(renderer,
-				   x_axes - 2, y_axes + i,
-				   x_axes + 2, y_axes + i);
-
-		/* rendering numbers on axes */
-		render_number(renderer, font, x_axes_number, x_axes + i, y_axes);
-		render_number(renderer, font, y_axes_number, x_axes, y_axes + i);
-
-		x_axes_number++;
-		y_axes_number--;
-	}
-}
-
 void plotting(SDL_Renderer *renderer, int width, double line_thicnkess) {
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); /* color red for dots */
 
@@ -104,7 +76,7 @@ void plotting(SDL_Renderer *renderer, int width, double line_thicnkess) {
 	int previous_y_pos = 0;
 
 	bool draw_line = false;
-	for (double x = -x_max; x <= x_max; x += step) { /* looping through all the values of x */
+	for (double x = -x_max; x <= x_max; x += plotting_step) { /* looping through all the values of x */
         double function = f(x);
 		
         int x_pos = x * STEP + x_axes;
@@ -132,6 +104,39 @@ void plotting(SDL_Renderer *renderer, int width, double line_thicnkess) {
 						  255, 0, 0, 255);
 		}
     }
+}
+
+void rendering_coordinates(SDL_Renderer *renderer, int width, int height, TTF_Font *font) {
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+	SDL_RenderDrawLine(renderer,
+						0, y_axes,
+						width, y_axes); /* horizontal axes line */
+
+	SDL_RenderDrawLine(renderer,
+						x_axes, 0,
+						x_axes, height); /* vertical axes line */
+
+	int x_axes_number = -(width / STEP);
+	int y_axes_number = height / STEP;
+
+	// ???
+	for (int i=-width; i<=width; i+=STEP) {
+		SDL_RenderDrawLine(renderer,
+				    x_axes + i, y_axes - 2,
+				    x_axes + i, y_axes + 2);
+
+		SDL_RenderDrawLine(renderer,
+				   x_axes - 2, y_axes + i,
+				   x_axes + 2, y_axes + i);
+
+		/* rendering numbers on axes */
+		render_number(renderer, font, x_axes_number, x_axes + i, y_axes); /* horizontal */
+		render_number(renderer, font, y_axes_number, x_axes, y_axes + i); /* vertical */ 
+
+		x_axes_number++;
+		y_axes_number--;
+	}
 }
 
 int main(int argc, char *argv[]) {
@@ -188,11 +193,12 @@ int main(int argc, char *argv[]) {
 					sdl_clean_up(window, renderer, font);
 					return EXIT_SUCCESS;
 				case SDL_MOUSEMOTION:
-					/* TODO: find better way to declare this */
 					if (event.motion.state & SDL_BUTTON_LMASK) {
 						x_axes += event.motion.xrel;
 						y_axes += event.motion.yrel;
 					}
+					/* if mouse x and y is equal to point coordinates
+					 give small box with coordinates */
 					break;
 				case SDL_KEYDOWN:
 					switch(event.key.keysym.sym) {
