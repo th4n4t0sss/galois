@@ -1,11 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <math.h>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
-//#include <SDL2/SDL2_gfxPrimitives.h>
+#include <SDL2/SDL2_gfxPrimitives.h>
 
 #define SCREEN_WIDTH 600
 #define SCREEN_HEIGHT 600
@@ -14,7 +13,7 @@
 int step = 50;
 double plotting_step = 0.1; /* TODO: get the step from step variable */
 
-double line_thicnkess = 3.0;
+double line_thickness = 3.0;
 bool show_line = true;
 
 int x_mouse = 0;
@@ -72,9 +71,7 @@ void render_number(SDL_Renderer *renderer, TTF_Font *font, int number, int x, in
     SDL_FreeSurface(surface);
 }
 
-void plotting(SDL_Renderer *renderer, int width, double line_thicnkess, TTF_Font *font) {
-	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); /* color red for dots */
-
+void plotting(SDL_Renderer *renderer, int width, double line_thickness, TTF_Font *font) {
 	int x_max = width / step; /* should be maximum coordinates for x but i am not sure that this is proper way */
 
 	int previous_x_pos = 0;
@@ -90,14 +87,11 @@ void plotting(SDL_Renderer *renderer, int width, double line_thicnkess, TTF_Font
 		if (show_line) {
 			/* TODO: draw line clever way */
 			if (draw_line) {
-				/*thickLineRGBA(renderer,
+				thickLineRGBA(renderer,
 								previous_x_pos, previous_y_pos,
 								x_pos, y_pos,
-								line_thicnkess,
-								255, 0, 0, 255);*/
-				SDL_RenderDrawLine(renderer,
-									previous_x_pos, previous_y_pos,
-									x_pos, y_pos);
+								line_thickness,
+								255, 0, 0, 255);
 			}
 
 			previous_x_pos = x_pos;
@@ -105,18 +99,17 @@ void plotting(SDL_Renderer *renderer, int width, double line_thicnkess, TTF_Font
 			draw_line = true;
 		} else {
 			/* drawing thick dot but because SDL_DrawPoint doesn't have point thickness argument */
-			/* thickLineRGBA(renderer,
+			thickLineRGBA(renderer,
 						  x_pos, y_pos,
 						  x_pos,y_pos,
-						  line_thicnkess,
-						  255, 0, 0, 255);*/
-			SDL_RenderDrawPoint(renderer, x_pos, y_pos);
+						  line_thickness,
+						  255, 0, 0, 255);
 
 		}
 
 		/*if (check_mouse_hover(x_pos, y_pos)) {
-			render_number(renderer, font, x, x_pos + line_thicnkess + 10, y_pos);
-			render_number(renderer, font, (int)function, x_pos + line_thicnkess + 20, y_pos);
+			render_number(renderer, font, x, x_pos + line_thickness + 10, y_pos);
+			render_number(renderer, font, (int)function, x_pos + line_thickness + 20, y_pos);
 		}*/
     }
 }
@@ -148,6 +141,8 @@ void rendering_coordinates(SDL_Renderer *renderer, int width, int height, TTF_Fo
 		/* rendering numbers on axes */
 		render_number(renderer, font, x_axes_number, x_axes + i, y_axes); /* horizontal */
 		render_number(renderer, font, y_axes_number, x_axes, y_axes + i); /* vertical */ 
+		/*stringRGBA(renderer,x_axes + i, y_axes, "h", 255, 255, 255, 255);
+		stringRGBA(renderer,x_axes, y_axes + i, "v", 255, 255, 255, 255);*/
 
 		x_axes_number++;
 		y_axes_number--;
@@ -156,6 +151,7 @@ void rendering_coordinates(SDL_Renderer *renderer, int width, int height, TTF_Fo
 
 int main(int argc, char *argv[]) {
 	int width, height;
+	bool running = true;
 
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 		fprintf(stderr, "could not initialize sdl2: %s\n", SDL_GetError()) ;
@@ -201,12 +197,12 @@ int main(int argc, char *argv[]) {
 	SDL_Event event;
 	SDL_StartTextInput();
 
-	while (1) {
+	while (running) {
 		while(SDL_PollEvent(&event)) {
 			switch (event.type) {
 				case SDL_QUIT:
-					sdl_clean_up(window, renderer, font);
-					return EXIT_SUCCESS;
+					running = false;
+					break;
 				case SDL_MOUSEMOTION:
 					if (event.motion.state & SDL_BUTTON_LMASK) {
 						x_axes += event.motion.xrel;
@@ -220,13 +216,13 @@ int main(int argc, char *argv[]) {
 						case SDLK_MINUS: /* decrease the coordinate number spectrume */
 							if (step > 1.0)
 								step -= 5;
-							if (line_thicnkess > 2.0)
-								line_thicnkess -= 0.15;
+							if (line_thickness > 2.0)
+								line_thickness -= 0.15;
 							break;
 						case SDLK_EQUALS: /* increase the coordinate number spectrume */
 							step += 5;
-							if (line_thicnkess < 6.0)
-								line_thicnkess += 0.15;
+							if (line_thickness < 6.0)
+								line_thickness += 0.15;
 							break;
 						case SDLK_0:
 							x_axes = width / 2;
@@ -245,7 +241,6 @@ int main(int argc, char *argv[]) {
 					if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
 						x_axes = width / 2;
 						y_axes = height / 2;
-
 					}
 					/* TODO: call rendering_coordinates and ploting functions on window resize */
 					/*if (event.window.event == SDL_WINDOWEVENT_EXPOSED) {
@@ -268,7 +263,7 @@ int main(int argc, char *argv[]) {
 		SDL_GetWindowSize(window, &width, &height);
 
 		rendering_coordinates(renderer, width, height, font);
-		plotting(renderer, width, line_thicnkess, font);
+		plotting(renderer, width, line_thickness, font);
 
 		SDL_RenderPresent(renderer);
 	}
