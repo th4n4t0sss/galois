@@ -11,7 +11,7 @@
 
 /* TODO: better way to define this variables */
 int step = 50;
-double plotting_step = 0.1; /* TODO: get the step from step variable */
+double plotting_step = 1; /* TODO: get the step from step variable */
 
 double line_thickness = 3.0;
 bool show_line = true;
@@ -39,6 +39,7 @@ int check_mouse_hover(int point_x, int point_y) {
 	int x,y;
 	SDL_GetMouseState(&x, &y);
 
+	/* TODO: too shitty algorithm. need to be rewritten */
 	bool is_in_x = false;
 	bool is_in_y = false;
 
@@ -65,7 +66,7 @@ int check_mouse_hover(int point_x, int point_y) {
 void render_number(SDL_Renderer *renderer, TTF_Font *font, int number, int x, int y) { 
 	SDL_Color textColor = {255, 255, 255, 255};
 
-    char numberText[16];
+    char numberText[8];
     snprintf(numberText, sizeof(numberText), "%d", number);
 
     SDL_Surface *surface = TTF_RenderText_Solid(font, numberText, textColor);
@@ -130,8 +131,8 @@ void plotting(SDL_Renderer *renderer, int width, double line_thickness, TTF_Font
 		}
 
 		if (check_mouse_hover(x_pos, y_pos)) {
-			render_number(renderer, font, x, x_pos + line_thickness + 10, y_pos - line_thickness / 2.0);
-			render_number(renderer, font, (int)function, x_pos + line_thickness + 30, y_pos - line_thickness / 2.0);
+			render_number(renderer, font, x, x_pos + line_thickness + 10, y_pos);
+			render_number(renderer, font, (int)function, x_pos + line_thickness + 30, y_pos);
 		}
     }
 }
@@ -209,7 +210,7 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	TTF_Font *font = TTF_OpenFont("./fonts/terminalvector.ttf", 10);
+	TTF_Font *font = TTF_OpenFont("./fonts/terminalvector.ttf", 12);
 	if (font == NULL) {
 		sdl_clean_up(window, renderer, font);
 		fprintf(stderr, "font not found: %s\n", SDL_GetError()) ;
