@@ -39,7 +39,24 @@ int check_mouse_hover(int point_x, int point_y) {
 	int x,y;
 	SDL_GetMouseState(&x, &y);
 
-	if (x == point_x && y == point_y)
+	bool is_in_x = false;
+	bool is_in_y = false;
+
+	/* from point_x - line_thickness to point_x + line_thickness */
+	for (int i=point_x - line_thickness;i <= point_x + line_thickness; ++i)
+		if (x == i) {
+			is_in_x = true;
+			break;
+		}
+
+	/* from point_y - line_thickness to point_y + line_thickness */
+	for (int i=point_y - line_thickness;i <= point_y + line_thickness; ++i)
+		if (y == i) {
+			is_in_y = true;
+			break;
+		}
+	
+	if (is_in_x && is_in_y)
 		return true;
 	return false;
 }
@@ -87,11 +104,14 @@ void plotting(SDL_Renderer *renderer, int width, double line_thickness, TTF_Font
 		if (show_line) {
 			/* TODO: draw line clever way */
 			if (draw_line) {
-				thickLineRGBA(renderer,
+				/*thickLineRGBA(renderer,
 								previous_x_pos, previous_y_pos,
 								x_pos, y_pos,
 								line_thickness,
-								255, 0, 0, 255);
+								255, 0, 0, 255);*/
+				SDL_RenderDrawLine(renderer,
+									previous_x_pos, previous_y_pos,
+									x_pos, y_pos);
 			}
 
 			previous_x_pos = x_pos;
@@ -104,13 +124,15 @@ void plotting(SDL_Renderer *renderer, int width, double line_thickness, TTF_Font
 						  x_pos,y_pos,
 						  line_thickness,
 						  255, 0, 0, 255);
+			/*SDL_RenderDrawPoint(renderer,
+								x_pos, y_pos);*/
 
 		}
 
-		/*if (check_mouse_hover(x_pos, y_pos)) {
-			render_number(renderer, font, x, x_pos + line_thickness + 10, y_pos);
-			render_number(renderer, font, (int)function, x_pos + line_thickness + 20, y_pos);
-		}*/
+		if (check_mouse_hover(x_pos, y_pos)) {
+			render_number(renderer, font, x, x_pos + line_thickness + 10, y_pos - line_thickness / 2.0);
+			render_number(renderer, font, (int)function, x_pos + line_thickness + 30, y_pos - line_thickness / 2.0);
+		}
     }
 }
 
