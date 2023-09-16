@@ -12,7 +12,7 @@
 #define PLOTTING_STEP 1.0
 
 /* TODO: better way to define this variables */
-int step = PLOTTING_STEP * 30;
+int step = PLOTTING_STEP * 100;
 
 double line_thickness = 3.0;
 bool show_line = true;
@@ -148,6 +148,7 @@ void rendering_coordinates(SDL_Renderer *renderer, int width, int height, TTF_Fo
 	int x_axes_number = -(x_max);
 	int y_axes_number = y_max;
 
+	/* TODO: rewrite this for loops.need optimizatino */
 	for (double y = -y_max; y <= y_max; y += PLOTTING_STEP) { /* looping through all values of y */
 		int y_pos = y_axes - y * step;
 
