@@ -36,24 +36,18 @@ int check_mouse_hover(int point_x, int point_y) {
 	SDL_GetMouseState(&x, &y);
 
 	/* TODO: too shitty algorithm. need to be rewritten */
-	bool is_in_x = false;
-	bool is_in_y = false;
+	bool in_x = false;
+	bool in_y = false;
 
 	/* from point_x - line_thickness to point_x + line_thickness */
-	for (int i=point_x - line_thickness;i <= point_x + line_thickness; ++i)
-		if (x == i) {
-			is_in_x = true;
-			break;
-		}
+	if (x >= point_x - line_thickness && x <= point_x + line_thickness)
+		in_x = true;
 
 	/* from point_y - line_thickness to point_y + line_thickness */
-	for (int i=point_y - line_thickness;i <= point_y + line_thickness; ++i)
-		if (y == i) {
-			is_in_y = true;
-			break;
-		}
+	if (y >= point_y - line_thickness && y <= point_y + line_thickness)
+		in_y = true;
 	
-	if (is_in_x && is_in_y)
+	if (in_x && in_y)
 		return true;
 	return false;
 }
