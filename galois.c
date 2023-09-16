@@ -9,8 +9,10 @@
 #define SCREEN_WIDTH 600
 #define SCREEN_HEIGHT 600
 
+#define PLOTTING_STEP 1.0
+
 /* TODO: better way to define this variables */
-int step = 50;
+int step = PLOTTING_STEP * 30;
 
 double line_thickness = 3.0;
 bool show_line = true;
@@ -79,34 +81,28 @@ void render_number(SDL_Renderer *renderer, TTF_Font *font, int number, int x, in
 }
 
 void plotting(SDL_Renderer *renderer, int width, double line_thickness, TTF_Font *font) {
-	double plotting_step = 0.1; /* TODO: get the step from step variable */
 	int x_max = width / step;
-	if (x_axes / step> 0)
-		x_max += x_axes / step; /* should be maximum coordinates for x but i am not sure that this is proper way */
-	else 
-		x_max -= x_axes / step; /* should be maximum coordinates for x but i am not sure that this is proper way */
+	if (x_axes > 0)
+		x_max += x_axes / step;
+	else x_max -= x_axes / step;
 
 	int previous_x_pos = 0;
 	int previous_y_pos = 0;
 
 	bool draw_line = false;
-	for (double x = -x_max; x <= x_max; x += plotting_step) { /* looping through all values of x */
+	for (double x = -x_max; x <= x_max; x += PLOTTING_STEP) { /* looping through all values of x */
         double function = f(x);
 		
         int x_pos = x * step + x_axes;
         int y_pos = y_axes - function * step;
 
 		if (show_line) {
-			/* TODO: draw line clever way */
 			if (draw_line) {
 				thickLineRGBA(renderer,
 								previous_x_pos, previous_y_pos,
 								x_pos, y_pos,
 								line_thickness,
 								255, 0, 0, 255);
-				/*SDL_RenderDrawLine(renderer,
-									previous_x_pos, previous_y_pos,
-									x_pos, y_pos);*/
 			}
 
 			previous_x_pos = x_pos;
@@ -119,9 +115,6 @@ void plotting(SDL_Renderer *renderer, int width, double line_thickness, TTF_Font
 						  x_pos,y_pos,
 						  line_thickness,
 						  255, 0, 0, 255);
-			/*SDL_RenderDrawPoint(renderer,
-								x_pos, y_pos);*/
-
 		}
 
 		if (check_mouse_hover(x_pos, y_pos)) {
@@ -142,22 +135,35 @@ void rendering_coordinates(SDL_Renderer *renderer, int width, int height, TTF_Fo
 						x_axes, 0,
 						x_axes, height); /* vertical axes line */
 
-	int x_axes_number = -(width / step);
-	int y_axes_number = height / step;
+	int x_max = width / step;
+	if (x_axes > width / 2)
+		x_max += x_axes / step;
+	else x_max -= x_axes / step;
 
-	// ???
-	for (int i=-width; i<=width; i+=step) {
+	int y_max = height / step;
+	if (y_axes > height / 2)
+		y_max += y_axes / step;
+	else y_max -= y_axes / step;
+
+	int x_axes_number = -(x_max);
+	int y_axes_number = y_max;
+
+	for (double i = -x_max; i <= x_max; i += PLOTTING_STEP) { /* looping through all values of x */
+        int x_pos = x_axes + i * step;
+		/* TODO: fix the y axes number rendering bug */
+        int y_pos = y_axes - i * step;
+		
 		SDL_RenderDrawLine(renderer, /* horizontal */
-					x_axes + i, y_axes - 2,
-					x_axes + i, y_axes + 2);
+					x_pos, y_axes - 2,
+					x_pos, y_axes + 2);
 
 		SDL_RenderDrawLine(renderer, /* veritcal */
-					x_axes - 2, y_axes + i,
-					x_axes + 2, y_axes + i);
+					x_axes - 2, y_pos,
+					x_axes + 2, y_pos);
 
 		/* rendering numbers on axes */
-		render_number(renderer, font, x_axes_number, x_axes + i + 4, y_axes + 4); /* horizontal */
-		render_number(renderer, font, y_axes_number, x_axes + 4, y_axes + i + 4); /* vertical */ 
+		render_number(renderer, font, x_axes_number, x_pos, y_axes); /* horizontal */
+		render_number(renderer, font, y_axes_number, x_axes, y_pos); /* vertical */ 
 
 		x_axes_number++;
 		y_axes_number--;
@@ -296,7 +302,6 @@ int main(int argc, char *argv[]) {
 			SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 			SDL_RenderDrawRect(renderer, &inputBoxRect);
 
-			// Render the text in the input box
 			SDL_Texture *textTexture = renderText(renderer, font, inputText, textColor);
 			SDL_Rect textRect = { inputBoxRect.x + 10, inputBoxRect.y + (inputBoxRect.h - 24) / 2, 0, 0 };
 			SDL_QueryTexture(textTexture, NULL, NULL, &textRect.w, &textRect.h);
