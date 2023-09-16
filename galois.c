@@ -148,25 +148,26 @@ void rendering_coordinates(SDL_Renderer *renderer, int width, int height, TTF_Fo
 	int x_axes_number = -(x_max);
 	int y_axes_number = y_max;
 
-	for (double i = -x_max; i <= x_max; i += PLOTTING_STEP) { /* looping through all values of x */
-        int x_pos = x_axes + i * step;
-		/* TODO: fix the y axes number rendering bug */
-        int y_pos = y_axes - i * step;
-		
-		SDL_RenderDrawLine(renderer, /* horizontal */
-					x_pos, y_axes - 2,
-					x_pos, y_axes + 2);
+	for (double y = -y_max; y <= y_max; y += PLOTTING_STEP) { /* looping through all values of y */
+		int y_pos = y_axes - y * step;
 
 		SDL_RenderDrawLine(renderer, /* veritcal */
 					x_axes - 2, y_pos,
 					x_axes + 2, y_pos);
 
+		render_number(renderer, font, y_axes_number, x_axes, y_pos); /* vertical */ 
+		y_axes_number--;
+	}
+	for (double x = -x_max; x <= x_max; x += PLOTTING_STEP) { /* looping through all values of x */
+        int x_pos = x_axes + x * step;
+
+		SDL_RenderDrawLine(renderer, /* horizontal */
+					x_pos, y_axes - 2,
+					x_pos, y_axes + 2);
+
 		/* rendering numbers on axes */
 		render_number(renderer, font, x_axes_number, x_pos, y_axes); /* horizontal */
-		render_number(renderer, font, y_axes_number, x_axes, y_pos); /* vertical */ 
-
 		x_axes_number++;
-		y_axes_number--;
 	}
 }
 
