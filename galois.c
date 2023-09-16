@@ -35,18 +35,9 @@ int check_mouse_hover(int point_x, int point_y) {
 	int x,y;
 	SDL_GetMouseState(&x, &y);
 
-	/* TODO: too shitty algorithm. need to be rewritten */
-	bool in_x = false;
-	bool in_y = false;
+	bool in_x = point_x - line_thickness <= x && x <= point_x + line_thickness;
+	bool in_y = point_y - line_thickness <= y && y <= point_y + line_thickness;
 
-	/* from point_x - line_thickness to point_x + line_thickness */
-	if (x >= point_x - line_thickness && x <= point_x + line_thickness)
-		in_x = true;
-
-	/* from point_y - line_thickness to point_y + line_thickness */
-	if (y >= point_y - line_thickness && y <= point_y + line_thickness)
-		in_y = true;
-	
 	if (in_x && in_y)
 		return true;
 	return false;
@@ -164,7 +155,6 @@ void rendering_coordinates(SDL_Renderer *renderer, int width, int height, TTF_Fo
 					x_axes - 2, y_axes + i,
 					x_axes + 2, y_axes + i);
 
-		printf("%d\n", x_axes);
 		/* rendering numbers on axes */
 		render_number(renderer, font, x_axes_number, x_axes + i + 4, y_axes + 4); /* horizontal */
 		render_number(renderer, font, y_axes_number, x_axes + 4, y_axes + i + 4); /* vertical */ 
@@ -178,7 +168,7 @@ int main(int argc, char *argv[]) {
 	int width, height;
 	int input_width, input_height;
 
-	char inputText[256] = "f(x) = ";  // The text entered by the user
+	char inputText[256] = "f(x) = ";
 
 	bool running = true;
 	bool show_prompt = false;
@@ -245,22 +235,11 @@ int main(int argc, char *argv[]) {
 					/* TODO: rewrite this bullshit idiot */
 					if (show_prompt) {
 						if (strlen(inputText) < 255) {
-						// Append character to text if not full
 							if (event.key.keysym.sym == SDLK_BACKSPACE && strlen(inputText) > 0) {
-								// Handle backspace
 								inputText[strlen(inputText) - 1] = '\0';
-							} else if (event.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL) {
-								// Handle Ctrl+C for copy
-								SDL_SetClipboardText(inputText);
-							} else if (event.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL) {
-								// Handle Ctrl+V for paste
-								const char* clipboardText = SDL_GetClipboardText();
-								strcat(inputText, clipboardText);
-								SDL_free((void*)clipboardText);
 							} else if (event.key.keysym.sym == SDLK_ESCAPE) {
 								show_prompt = false;
 							} else {
-								// Append the character
 								strcat(inputText, SDL_GetKeyName(event.key.keysym.sym));
 							}
 						}
