@@ -11,7 +11,7 @@
 
 /* TODO: better way to define this variables */
 int step = 50;
-double plotting_step = 1; /* TODO: get the step from step variable */
+double plotting_step = 0.1; /* TODO: get the step from step variable */
 
 double line_thickness = 3.0;
 bool show_line = true;
@@ -62,6 +62,15 @@ int check_mouse_hover(int point_x, int point_y) {
 	return false;
 }
 
+/* rendering text TODO: render numbers also with this functions */
+SDL_Texture* renderText(SDL_Renderer* renderer, TTF_Font* font, const char* text, SDL_Color textColor) {
+    SDL_Surface* surface = TTF_RenderText_Solid(font, text, textColor);
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+    return texture;
+}
+
+
 /* rendering number text */
 void render_number(SDL_Renderer *renderer, TTF_Font *font, int number, int x, int y) { 
 	SDL_Color textColor = {255, 255, 255, 255};
@@ -105,14 +114,14 @@ void plotting(SDL_Renderer *renderer, int width, double line_thickness, TTF_Font
 		if (show_line) {
 			/* TODO: draw line clever way */
 			if (draw_line) {
-				/*thickLineRGBA(renderer,
+				thickLineRGBA(renderer,
 								previous_x_pos, previous_y_pos,
 								x_pos, y_pos,
 								line_thickness,
-								255, 0, 0, 255);*/
-				SDL_RenderDrawLine(renderer,
+								255, 0, 0, 255);
+				/*SDL_RenderDrawLine(renderer,
 									previous_x_pos, previous_y_pos,
-									x_pos, y_pos);
+									x_pos, y_pos);*/
 			}
 
 			previous_x_pos = x_pos;
@@ -148,24 +157,25 @@ void rendering_coordinates(SDL_Renderer *renderer, int width, int height, TTF_Fo
 						x_axes, 0,
 						x_axes, height); /* vertical axes line */
 
-	int x_axes_number = -(width / step);
+	int x_axes_number = -(x_axes / step);
 	int y_axes_number = height / step;
 
 	// ???
 	for (int i=-width; i<=width; i+=step) {
-		SDL_RenderDrawLine(renderer,
-				    x_axes + i, y_axes - 2,
-				    x_axes + i, y_axes + 2);
+		SDL_RenderDrawLine(renderer, /* horizontal */
+					x_axes + i, y_axes - 2,
+					x_axes + i, y_axes + 2);
 
-		SDL_RenderDrawLine(renderer,
-				   x_axes - 2, y_axes + i,
-				   x_axes + 2, y_axes + i);
+		SDL_RenderDrawLine(renderer, /* veritcal */
+					x_axes - 2, y_axes + i,
+					x_axes + 2, y_axes + i);
 
+		printf("%d\n", x_axes);
 		/* rendering numbers on axes */
+		// render_number(renderer, font, x_axes_number, x_axes + i + 2, y_axes + 2); /* horizontal */
+		// render_number(renderer, font, y_axes_number, x_axes + 2, y_axes + i + 2); /* vertical */ 
 		render_number(renderer, font, x_axes_number, x_axes + i, y_axes); /* horizontal */
 		render_number(renderer, font, y_axes_number, x_axes, y_axes + i); /* vertical */ 
-		/*stringRGBA(renderer,x_axes + i, y_axes, "h", 255, 255, 255, 255);
-		stringRGBA(renderer,x_axes, y_axes + i, "v", 255, 255, 255, 255);*/
 
 		x_axes_number++;
 		y_axes_number--;
@@ -174,7 +184,14 @@ void rendering_coordinates(SDL_Renderer *renderer, int width, int height, TTF_Fo
 
 int main(int argc, char *argv[]) {
 	int width, height;
+	int input_width, input_height;
+
+	char inputText[256] = "";  // The text entered by the user
+
 	bool running = true;
+	bool show_prompt = false;
+
+    SDL_Color textColor = { 255, 255, 255, 255 };
 
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 		fprintf(stderr, "could not initialize sdl2: %s\n", SDL_GetError()) ;
@@ -190,11 +207,6 @@ int main(int argc, char *argv[]) {
 						SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,
 						SCREEN_WIDTH, SCREEN_HEIGHT,
 						SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN);
-
-	SDL_GetWindowSize(window, &width, &height);
-
-	x_axes = width / 2;
-	y_axes = height / 2;
 
 	if (window == NULL) {
 		fprintf(stderr, "could not initialize window: %s\n", SDL_GetError()) ;
@@ -217,6 +229,11 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
+	SDL_GetWindowSize(window, &width, &height);
+
+	x_axes = width / 2;
+	y_axes = height / 2;
+
 	SDL_Event event;
 	SDL_StartTextInput();
 
@@ -231,33 +248,56 @@ int main(int argc, char *argv[]) {
 						x_axes += event.motion.xrel;
 						y_axes += event.motion.yrel;
 					}
-					/* if mouse x and y is equal to point coordinates
-					 give small box with coordinates */
 					break;
 				case SDL_KEYDOWN:
-					switch(event.key.keysym.sym) {
-						case SDLK_MINUS: /* decrease the coordinate number spectrume */
-							if (step > 1.0)
-								step -= 5;
-							if (line_thickness > 2.0)
-								line_thickness -= 0.15;
-							break;
-						case SDLK_EQUALS: /* increase the coordinate number spectrume */
-							step += 5;
-							if (line_thickness < 6.0)
-								line_thickness += 0.15;
-							break;
-						case SDLK_0:
-							x_axes = width / 2;
-							y_axes = height / 2;
-							break;
-						case SDLK_l: /* toggle line drawing on "l" */
-							show_line = !show_line;
-							break;
-						case SDLK_f: /* TODO: add text prompt for f(x) function */
-							break;
-						default:
-							break;
+					/* TODO: rewrite this bullshit idiot */
+					if (show_prompt) {
+						if (strlen(inputText) < 255) {
+						// Append character to text if not full
+							if (event.key.keysym.sym == SDLK_BACKSPACE && strlen(inputText) > 0) {
+								// Handle backspace
+								inputText[strlen(inputText) - 1] = '\0';
+							} else if (event.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL) {
+								// Handle Ctrl+C for copy
+								SDL_SetClipboardText(inputText);
+							} else if (event.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL) {
+								// Handle Ctrl+V for paste
+								const char* clipboardText = SDL_GetClipboardText();
+								strcat(inputText, clipboardText);
+								SDL_free((void*)clipboardText);
+							} else if (event.key.keysym.sym == SDLK_ESCAPE) {
+								show_prompt = false;
+							} else {
+								// Append the character
+								strcat(inputText, SDL_GetKeyName(event.key.keysym.sym));
+							}
+						}
+					} else {
+						switch(event.key.keysym.sym) {
+							case SDLK_MINUS: /* decrease the coordinate number spectrume */
+								if (step > 1.0)
+									step -= 5;
+								if (line_thickness > 2.0)
+									line_thickness -= 0.15;
+								break;
+							case SDLK_EQUALS: /* increase the coordinate number spectrume */
+								step += 5;
+								if (line_thickness < 6.0)
+									line_thickness += 0.15;
+								break;
+							case SDLK_0:
+								x_axes = width / 2;
+								y_axes = height / 2;
+								break;
+							case SDLK_l: /* toggle line drawing on "l" */
+								show_line = !show_line;
+								break;
+							case SDLK_f: /* TODO: add text prompt for f(x) function */
+								show_prompt = true;
+								break;
+							default:
+								break;
+						}
 					}
 					break;
 				case SDL_WINDOWEVENT:
@@ -265,16 +305,6 @@ int main(int argc, char *argv[]) {
 						x_axes = width / 2;
 						y_axes = height / 2;
 					}
-					/* TODO: call rendering_coordinates and ploting functions on window resize */
-					/*if (event.window.event == SDL_WINDOWEVENT_EXPOSED) {
-					    SDL_RenderClear(renderer);
-
-						SDL_GetWindowSize(window, &width, &height);
-						printf("%d : %d\n", width, height);
-
-						rendering_coordinate_system(renderer, width, height, font);
-						plotting(renderer, width , height, font, LINE_THICKNESS);
-					}*/
 					break;
 				default:
 					break;
@@ -285,8 +315,26 @@ int main(int argc, char *argv[]) {
 
 		SDL_GetWindowSize(window, &width, &height);
 
-		rendering_coordinates(renderer, width, height, font);
-		plotting(renderer, width, line_thickness, font);
+		input_width = width / 2;
+		input_height = height / 15;
+
+		if (show_prompt) {
+			/* copy pasta code need to be rewritten normally or i AI will replace me */
+			// Render the text input box
+			SDL_Rect inputBoxRect = { (width - input_width) / 2, (height - input_height) / 2, input_width, input_height };
+			SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+			SDL_RenderDrawRect(renderer, &inputBoxRect);
+
+			// Render the text in the input box
+			SDL_Texture *textTexture = renderText(renderer, font, inputText, textColor);
+			SDL_Rect textRect = { inputBoxRect.x + 10, inputBoxRect.y + (inputBoxRect.h - 24) / 2, 0, 0 };
+			SDL_QueryTexture(textTexture, NULL, NULL, &textRect.w, &textRect.h);
+			SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+			SDL_DestroyTexture(textTexture);
+		} else {
+			rendering_coordinates(renderer, width, height, font);
+			plotting(renderer, width, line_thickness, font);
+		}
 
 		SDL_RenderPresent(renderer);
 	}
