@@ -11,19 +11,15 @@
 
 /* TODO: better way to define this variables */
 int step = 50;
-double plotting_step = 0.1; /* TODO: get the step from step variable */
 
 double line_thickness = 3.0;
 bool show_line = true;
-
-int x_mouse = 0;
-int y_mouse = 0;
 
 int x_axes, y_axes;
 
 /* TODO: text prompt for inserting mathematical function */
 double f(double x) {
-	return x * x;
+	return x;
 }
 
 void sdl_clean_up(SDL_Window *window, SDL_Renderer *renderer, TTF_Font *font) {
@@ -70,7 +66,6 @@ SDL_Texture* renderText(SDL_Renderer* renderer, TTF_Font* font, const char* text
     return texture;
 }
 
-
 /* rendering number text */
 void render_number(SDL_Renderer *renderer, TTF_Font *font, int number, int x, int y) { 
 	SDL_Color textColor = {255, 255, 255, 255};
@@ -99,7 +94,12 @@ void render_number(SDL_Renderer *renderer, TTF_Font *font, int number, int x, in
 }
 
 void plotting(SDL_Renderer *renderer, int width, double line_thickness, TTF_Font *font) {
-	int x_max = width / step; /* should be maximum coordinates for x but i am not sure that this is proper way */
+	double plotting_step = 0.1; /* TODO: get the step from step variable */
+	int x_max = width / step;
+	if (x_axes / step> 0)
+		x_max += x_axes / step; /* should be maximum coordinates for x but i am not sure that this is proper way */
+	else 
+		x_max -= x_axes / step; /* should be maximum coordinates for x but i am not sure that this is proper way */
 
 	int previous_x_pos = 0;
 	int previous_y_pos = 0;
@@ -157,7 +157,7 @@ void rendering_coordinates(SDL_Renderer *renderer, int width, int height, TTF_Fo
 						x_axes, 0,
 						x_axes, height); /* vertical axes line */
 
-	int x_axes_number = -(x_axes / step);
+	int x_axes_number = -(width / step);
 	int y_axes_number = height / step;
 
 	// ???
@@ -172,10 +172,8 @@ void rendering_coordinates(SDL_Renderer *renderer, int width, int height, TTF_Fo
 
 		printf("%d\n", x_axes);
 		/* rendering numbers on axes */
-		// render_number(renderer, font, x_axes_number, x_axes + i + 2, y_axes + 2); /* horizontal */
-		// render_number(renderer, font, y_axes_number, x_axes + 2, y_axes + i + 2); /* vertical */ 
-		render_number(renderer, font, x_axes_number, x_axes + i, y_axes); /* horizontal */
-		render_number(renderer, font, y_axes_number, x_axes, y_axes + i); /* vertical */ 
+		render_number(renderer, font, x_axes_number, x_axes + i + 4, y_axes + 4); /* horizontal */
+		render_number(renderer, font, y_axes_number, x_axes + 4, y_axes + i + 4); /* vertical */ 
 
 		x_axes_number++;
 		y_axes_number--;
@@ -186,7 +184,7 @@ int main(int argc, char *argv[]) {
 	int width, height;
 	int input_width, input_height;
 
-	char inputText[256] = "";  // The text entered by the user
+	char inputText[256] = "f(x) = ";  // The text entered by the user
 
 	bool running = true;
 	bool show_prompt = false;
