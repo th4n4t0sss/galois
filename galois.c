@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <math.h>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -14,7 +15,7 @@
 /* TODO: better way to define this variables */
 int step = PLOTTING_STEP * 100;
 
-double line_thickness = 3.0;
+double line_thickness = 4.0;
 bool show_line = true;
 
 int x_axes, y_axes;
@@ -24,12 +25,20 @@ double f(double x) {
 	return x;
 }
 
-int prime_number(int x) {
-	for (int i=0;i<=x;++i){
-		if (x % i == 0)
-			return NULL;
+bool is_prime(int n) {
+	if (n <= 1)
+		return false;
+	for (int i=2;i<=sqrt(n);++i) {
+		if (n % i == 0)
+			return false;
 	}
 	return true;
+}
+
+int primes(int x) {
+	if (is_prime(x))
+		return x;
+	return primes(x + 1);
 }
 
 void sdl_clean_up(SDL_Window *window, SDL_Renderer *renderer, TTF_Font *font, TTF_Font *prompt_font) {
@@ -116,7 +125,7 @@ void plotting(SDL_Renderer *renderer, int width, double line_thickness, TTF_Font
 
 	bool draw_line = false;
 	for (double x = -x_max; x <= x_max; x += PLOTTING_STEP) { /* looping through all values of x */
-        double function = f(x);
+        double function = primes(x);
 		
         int x_pos = x * step + x_axes;
         int y_pos = y_axes - function * step;
