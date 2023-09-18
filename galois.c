@@ -125,37 +125,42 @@ void plotting(SDL_Renderer *renderer, int width, double line_thickness, TTF_Font
 
 	bool draw_line = false;
 	for (double x = -x_max; x <= x_max; x += PLOTTING_STEP) { /* looping through all values of x */
-        double function = primes(x);
+		double function = primes(x);
 		
-        int x_pos = x * step + x_axes;
-        int y_pos = y_axes - function * step;
+		int x_pos = x * step + x_axes;
+		int y_pos = y_axes - function * step;
 
 		if (show_line) {
 			if (draw_line) {
 				thickLineRGBA(renderer,
-								previous_x_pos, previous_y_pos,
-								x_pos, y_pos,
-								line_thickness,
-								255, 0, 0, 255);
+							  previous_x_pos, previous_y_pos,
+							  x_pos, y_pos,
+							  line_thickness,
+							  255, 0, 0, 255);
 			}
-
-			previous_x_pos = x_pos;
-			previous_y_pos = y_pos;
 			draw_line = true;
 		} else {
 			/* drawing thick dot but because SDL_DrawPoint doesn't have point thickness argument */
 			thickLineRGBA(renderer,
 						  x_pos, y_pos,
 						  x_pos,y_pos,
-						  line_thickness,
+					      line_thickness,
 						  255, 0, 0, 255);
+
+			SDL_RenderDrawLine(renderer,
+			                   previous_x_pos, previous_y_pos,
+			                   x_pos, y_pos);
+			/* d = √[(x2 − x1)2 + (y2 − y1)2] */
 		}
+
+		previous_x_pos = x_pos;
+		previous_y_pos = y_pos;
 
 		if (check_mouse_hover(x_pos, y_pos)) {
 			render_number(renderer, font, x, x_pos + line_thickness + 10, y_pos);
 			render_number(renderer, font, (int)function, x_pos + line_thickness + 30, y_pos);
 		}
-    }
+	}
 }
 
 void rendering_coordinates(SDL_Renderer *renderer, int width, int height, TTF_Font *font) {
