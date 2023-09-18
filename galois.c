@@ -147,9 +147,9 @@ void plotting(SDL_Renderer *renderer, int width, double line_thickness, TTF_Font
 					      line_thickness,
 						  255, 0, 0, 255);
 
-			SDL_RenderDrawLine(renderer,
+			/* SDL_RenderDrawLine(renderer,
 			                   previous_x_pos, previous_y_pos,
-			                   x_pos, y_pos);
+			                   x_pos, y_pos); */
 			/* d = √[(x2 − x1)2 + (y2 − y1)2] */
 		}
 
@@ -316,7 +316,7 @@ int main(int argc, char *argv[]) {
 								x_axes = width / 2;
 								y_axes = height / 2;
 								break;
-							case SDLK_l: /* toggle line drawing on "l" */
+							case SDLK_p: /* toggle line drawing on "p" */
 								show_line = !show_line;
 								break;
 							case SDLK_f: /* TODO: add text prompt for f(x) function */
@@ -324,6 +324,18 @@ int main(int argc, char *argv[]) {
 								break;
 							case SDLK_s: /* TODO: add spherical coordinates option */
 								break;
+							/* vim like movement */
+							case SDLK_l:
+								x_axes-=10;
+								break;
+							case SDLK_h:
+								x_axes+=10;
+								break;
+							case SDLK_k:
+								y_axes+=10;
+								break;
+							case SDLK_j:
+								y_axes-=10;
 							default:
 								break;
 						}
