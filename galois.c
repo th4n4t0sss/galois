@@ -23,6 +23,15 @@ int x_axes, y_axes;
 double f(double x) {
 	return x;
 }
+
+int prime_number(int x) {
+	for (int i=0;i<=x;++i){
+		if (x % i == 0)
+			return NULL;
+	}
+	return true;
+}
+
 void sdl_clean_up(SDL_Window *window, SDL_Renderer *renderer, TTF_Font *font, TTF_Font *prompt_font) {
 	TTF_CloseFont(font);
 	TTF_CloseFont(prompt_font);
@@ -191,8 +200,9 @@ void rendering_coordinates(SDL_Renderer *renderer, int width, int height, TTF_Fo
 
 int main(int argc, char *argv[]) {
 	int width, height;
-	int input_width, input_height;
+	int old_width, old_height;
 
+	int input_width, input_height;
 	char inputText[256] = "f (x) = ";
 
 	bool running = true;
@@ -298,6 +308,8 @@ int main(int argc, char *argv[]) {
 							case SDLK_f: /* TODO: add text prompt for f(x) function */
 								show_prompt = true;
 								break;
+							case SDLK_s: /* TODO: add spherical coordinates option */
+								break;
 							default:
 								break;
 						}
@@ -305,8 +317,13 @@ int main(int argc, char *argv[]) {
 					break;
 				case SDL_WINDOWEVENT:
 					if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
-						x_axes = width / 2;
-						y_axes = height / 2;
+						if (width > old_width)
+							x_axes += width - old_width;
+						else if (width < old_width)
+							x_axes += width - old_width;
+
+						old_width = width;
+						old_height = height;
 					}
 					break;
 				default:
