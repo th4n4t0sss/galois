@@ -23,9 +23,9 @@ int x_axes, y_axes;
 double f(double x) {
 	return x;
 }
-
-void sdl_clean_up(SDL_Window *window, SDL_Renderer *renderer, TTF_Font *font) {
+void sdl_clean_up(SDL_Window *window, SDL_Renderer *renderer, TTF_Font *font, TTF_Font *prompt_font) {
 	TTF_CloseFont(font);
+	TTF_CloseFont(prompt_font);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 
@@ -52,6 +52,22 @@ SDL_Texture* renderText(SDL_Renderer* renderer, TTF_Font* font, const char* text
     SDL_FreeSurface(surface);
     return texture;
 }
+
+void render_prompt
+(SDL_Renderer *renderer, int width, int input_width, int height, int input_height, TTF_Font *font, const char *inputText, SDL_Color textColor)
+{
+	/* copy pasta code need to be rewritten normally or i AI will replace me */
+	SDL_Rect inputBoxRect = { (width - input_width) / 2, (height - input_height) / 2, input_width, input_height };
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	SDL_RenderDrawRect(renderer, &inputBoxRect);
+
+	SDL_Texture *textTexture = renderText(renderer, font, inputText, textColor);
+	SDL_Rect textRect = { inputBoxRect.x + 10, inputBoxRect.y + (inputBoxRect.h - 24) / 2, 0, 0 };
+	SDL_QueryTexture(textTexture, NULL, NULL, &textRect.w, &textRect.h);
+	SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+	SDL_DestroyTexture(textTexture);
+}
+
 
 /* rendering number text */
 void render_number(SDL_Renderer *renderer, TTF_Font *font, int number, int x, int y) { 
@@ -158,7 +174,8 @@ void rendering_coordinates(SDL_Renderer *renderer, int width, int height, TTF_Fo
 
 		render_number(renderer, font, y_axes_number, x_axes, y_pos); /* vertical */ 
 		y_axes_number--;
-	}
+	} 
+
 	for (double x = -x_max; x <= x_max; x += PLOTTING_STEP) { /* looping through all values of x */
         int x_pos = x_axes + x * step;
 
@@ -176,7 +193,7 @@ int main(int argc, char *argv[]) {
 	int width, height;
 	int input_width, input_height;
 
-	char inputText[256] = "f(x) = ";
+	char inputText[256] = "f (x) = ";
 
 	bool running = true;
 	bool show_prompt = false;
@@ -213,9 +230,16 @@ int main(int argc, char *argv[]) {
 	}
 
 	TTF_Font *font = TTF_OpenFont("./fonts/terminalvector.ttf", 12);
+	TTF_Font *prompt_font = TTF_OpenFont("./fonts/new-roman-italic.ttf", 16);
+
 	if (font == NULL) {
-		sdl_clean_up(window, renderer, font);
-		fprintf(stderr, "font not found: %s\n", SDL_GetError()) ;
+		sdl_clean_up(window, renderer, font, prompt_font);
+		fprintf(stderr, "font not found: %s\n", SDL_GetError());
+		return EXIT_FAILURE;
+	}
+	if (prompt_font == NULL) {
+		sdl_clean_up(window, renderer, prompt_font, prompt_font);
+		fprintf(stderr, "prompt font found: %s\n", SDL_GetError());
 		return EXIT_FAILURE;
 	}
 
@@ -298,13 +322,12 @@ int main(int argc, char *argv[]) {
 		input_height = height / 15;
 
 		if (show_prompt) {
-			/* copy pasta code need to be rewritten normally or i AI will replace me */
-			// Render the text input box
+			/* copy pasta code need to be rewritten normally */
 			SDL_Rect inputBoxRect = { (width - input_width) / 2, (height - input_height) / 2, input_width, input_height };
 			SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 			SDL_RenderDrawRect(renderer, &inputBoxRect);
 
-			SDL_Texture *textTexture = renderText(renderer, font, inputText, textColor);
+			SDL_Texture *textTexture = renderText(renderer, prompt_font, inputText, textColor);
 			SDL_Rect textRect = { inputBoxRect.x + 10, inputBoxRect.y + (inputBoxRect.h - 24) / 2, 0, 0 };
 			SDL_QueryTexture(textTexture, NULL, NULL, &textRect.w, &textRect.h);
 			SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
@@ -317,7 +340,7 @@ int main(int argc, char *argv[]) {
 		SDL_RenderPresent(renderer);
 	}
 
-	sdl_clean_up(window, renderer, font);
+	sdl_clean_up(window, renderer, font, prompt_font);
 
 	return EXIT_SUCCESS;
 }
