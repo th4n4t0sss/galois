@@ -163,7 +163,19 @@ void plotting(SDL_Renderer *renderer, int width, double line_thickness, TTF_Font
 	}
 }
 
-void rendering_coordinates(SDL_Renderer *renderer, int width, int height, TTF_Font *font) {
+void spherical_coordinates(SDL_Renderer *renderer, int width , int height, TTF_Font *font) {
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+	circleRGBA(renderer, width / 2, height / 2, width / 2, 255, 255, 255, 255);
+
+	for (int i=0; i<=12; ++i) {
+		SDL_RenderDrawLine(renderer,
+							x_axes + i * step, 0,
+							x_axes - i * step, height); /* vertical axes line */
+	}
+}
+
+void cartesian_coordinates(SDL_Renderer *renderer, int width, int height, TTF_Font *font) {
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
 	SDL_RenderDrawLine(renderer,
@@ -221,6 +233,7 @@ int main(int argc, char *argv[]) {
 
 	bool running = true;
 	bool show_prompt = false;
+	bool cartesian = true;
 
     SDL_Color textColor = { 255, 255, 255, 255 };
 
@@ -323,6 +336,7 @@ int main(int argc, char *argv[]) {
 								show_prompt = true;
 								break;
 							case SDLK_s: /* TODO: add spherical coordinates option */
+								cartesian = !cartesian;
 								break;
 							/* vim like movement */
 							case SDLK_l:
@@ -376,8 +390,10 @@ int main(int argc, char *argv[]) {
 			SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
 			SDL_DestroyTexture(textTexture);
 		} else {
-			rendering_coordinates(renderer, width, height, font);
-			plotting(renderer, width, line_thickness, font);
+			if (cartesian) {
+				cartesian_coordinates(renderer, width, height, font);
+				plotting(renderer, width, line_thickness, font);
+			} else spherical_coordinates(renderer, width, height, font);
 		}
 
 		SDL_RenderPresent(renderer);
