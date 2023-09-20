@@ -25,6 +25,7 @@ double f(double x) {
 	return x;
 }
 
+/* testing prime numbers */
 bool is_prime(int n) {
 	if (n <= 1)
 		return false;
@@ -125,7 +126,7 @@ void plotting(SDL_Renderer *renderer, int width, double line_thickness, TTF_Font
 
 	bool draw_line = false;
 	for (double x = -x_max; x <= x_max; x += PLOTTING_STEP) { /* looping through all values of x */
-		double function = primes(x);
+		double function = f(x);
 		
 		int x_pos = x * step + x_axes;
 		int y_pos = y_axes - function * step;
