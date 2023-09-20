@@ -18,7 +18,13 @@ int step = PLOTTING_STEP * 100;
 double line_thickness = 4.0;
 bool show_line = true;
 
+int previous_x_pos, previous_y_pos;
+int x_pos, y_pos;
+
 int x_axes, y_axes;
+
+int x_array[256];
+int y_array[256];
 
 /* TODO: text prompt for inserting mathematical function */
 double f(double x) {
@@ -121,15 +127,19 @@ void plotting(SDL_Renderer *renderer, int width, double line_thickness, TTF_Font
 		x_max += x_axes / step;
 	else x_max -= x_axes / step;
 
-	int previous_x_pos = 0;
-	int previous_y_pos = 0;
+	previous_x_pos = 0;
+	previous_y_pos = 0;
 
 	bool draw_line = false;
+    int count = 0;
 	for (double x = -x_max; x <= x_max; x += PLOTTING_STEP) { /* looping through all values of x */
 		double function = f(x);
 		
-		int x_pos = x * step + x_axes;
-		int y_pos = y_axes - function * step;
+		x_pos = x * step + x_axes;
+		y_pos = y_axes - function * step;
+
+        x_array[count] = x_pos;
+        y_array[count] = y_pos;
 
 		if (show_line) {
 			if (draw_line) {
@@ -147,11 +157,7 @@ void plotting(SDL_Renderer *renderer, int width, double line_thickness, TTF_Font
 						  x_pos,y_pos,
 					      line_thickness,
 						  255, 0, 0, 255);
-
-			/* SDL_RenderDrawLine(renderer,
-			                   previous_x_pos, previous_y_pos,
-			                   x_pos, y_pos); */
-			/* d = √[(x2 − x1)2 + (y2 − y1)2] */
+            printf("%d : %d\n", x_pos, y_pos);
 		}
 
 		previous_x_pos = x_pos;
@@ -159,8 +165,9 @@ void plotting(SDL_Renderer *renderer, int width, double line_thickness, TTF_Font
 
 		if (check_mouse_hover(x_pos, y_pos)) {
 			render_number(renderer, font, x, x_pos + line_thickness + 10, y_pos);
-			render_number(renderer, font, (int)function, x_pos + line_thickness + 30, y_pos);
+			render_number(renderer, font, (int)function, x_pos + line_thickness + 40, y_pos);
 		}
+        count++;
 	}
 }
 
@@ -169,11 +176,16 @@ void spherical_coordinates(SDL_Renderer *renderer, int width , int height, TTF_F
 
 	circleRGBA(renderer, width / 2, height / 2, width / 2, 255, 255, 255, 255);
 
-	for (int i=0; i<=12; ++i) {
-		SDL_RenderDrawLine(renderer,
-							x_axes + i * step, 0,
-							x_axes - i * step, height); /* vertical axes line */
-	}
+    for (int i=0; i<24;++i) {
+        SDL_RenderDrawLine(renderer,
+                            0, y_axes - i * step,
+                            width, y_axes + i * step); /* horizontal axes line */
+    }
+
+    for (int i=0; i<2; ++i) 
+        SDL_RenderDrawLine(renderer,
+                            x_axes + i * step, 0,
+                            x_axes - i * step, height); /* vertical axes line */
 }
 
 void cartesian_coordinates(SDL_Renderer *renderer, int width, int height, TTF_Font *font) {
@@ -202,25 +214,25 @@ void cartesian_coordinates(SDL_Renderer *renderer, int width, int height, TTF_Fo
 
 	/* TODO: rewrite this for loops.need optimizatino */
 	for (double y = -y_max; y <= y_max; y += PLOTTING_STEP) { /* looping through all values of y */
-		int y_pos = y_axes - y * step;
+		int y_values = y_axes - y * step;
 
 		SDL_RenderDrawLine(renderer, /* veritcal */
-					x_axes - 2, y_pos,
-					x_axes + 2, y_pos);
+					x_axes - 2, y_values,
+					x_axes + 2, y_values);
 
-		render_number(renderer, font, y_axes_number, x_axes, y_pos); /* vertical */ 
+		render_number(renderer, font, y_axes_number, x_axes, y_values); /* vertical */ 
 		y_axes_number--;
 	} 
 
 	for (double x = -x_max; x <= x_max; x += PLOTTING_STEP) { /* looping through all values of x */
-        int x_pos = x_axes + x * step;
+        int x_values = x_axes + x * step;
 
 		SDL_RenderDrawLine(renderer, /* horizontal */
-					x_pos, y_axes - 2,
-					x_pos, y_axes + 2);
+					x_values, y_axes - 2,
+					x_values, y_axes + 2);
 
 		/* rendering numbers on axes */
-		render_number(renderer, font, x_axes_number, x_pos, y_axes); /* horizontal */
+		render_number(renderer, font, x_axes_number, x_values, y_axes); /* horizontal */
 		x_axes_number++;
 	}
 }
@@ -235,6 +247,9 @@ int main(int argc, char *argv[]) {
 	bool running = true;
 	bool show_prompt = false;
 	bool cartesian = true;
+
+    
+    int next = 0;
 
     SDL_Color textColor = { 255, 255, 255, 255 };
 
@@ -280,11 +295,6 @@ int main(int argc, char *argv[]) {
 		fprintf(stderr, "prompt font found: %s\n", SDL_GetError());
 		return EXIT_FAILURE;
 	}
-
-	SDL_GetWindowSize(window, &width, &height);
-
-	x_axes = width / 2;
-	y_axes = height / 2;
 
 	SDL_Event event;
 	SDL_StartTextInput();
@@ -341,16 +351,22 @@ int main(int argc, char *argv[]) {
 								break;
 							/* vim like movement */
 							case SDLK_l:
-								x_axes-=10;
+								x_axes-=20;
 								break;
 							case SDLK_h:
-								x_axes+=10;
+								x_axes+=20;
 								break;
 							case SDLK_k:
-								y_axes+=10;
+								y_axes+=20;
 								break;
 							case SDLK_j:
-								y_axes-=10;
+								y_axes-=20;
+                                break;
+                            case SDLK_n:
+                                next++;
+                                x_axes += x_array[next];
+                                y_axes += x_array[next];
+                                break;
 							default:
 								break;
 						}
@@ -358,13 +374,15 @@ int main(int argc, char *argv[]) {
 					break;
 				case SDL_WINDOWEVENT:
 					if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
-						if (width > old_width)
+						/* if (width > old_width)
 							x_axes += width - old_width;
 						else if (width < old_width)
 							x_axes += width - old_width;
 
 						old_width = width;
-						old_height = height;
+						old_height = height;*/
+                        x_axes = width / 2;
+                        y_axes = height / 2;
 					}
 					break;
 				default:
