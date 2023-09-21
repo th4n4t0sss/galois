@@ -132,6 +132,7 @@ void plotting(SDL_Renderer *renderer, int width, double line_thickness, TTF_Font
 
 	bool draw_line = false;
     int count = 0;
+
 	for (double x = -x_max; x <= x_max; x += PLOTTING_STEP) { /* looping through all values of x */
 		double function = f(x);
 		
@@ -176,16 +177,13 @@ void spherical_coordinates(SDL_Renderer *renderer, int width , int height, TTF_F
 
 	circleRGBA(renderer, width / 2, height / 2, width / 2, 255, 255, 255, 255);
 
-    for (int i=0; i<24;++i) {
-        SDL_RenderDrawLine(renderer,
-                            0, y_axes - i * step,
-                            width, y_axes + i * step); /* horizontal axes line */
-    }
+    SDL_RenderDrawLine(renderer, 0, y_axes + step, width, y_axes - step);
+    SDL_RenderDrawLine(renderer, 0, y_axes + 2 * step, width, y_axes - 2 * step);
+    SDL_RenderDrawLine(renderer, 0, y_axes + 3 * step, width, y_axes - 3 * step);
 
-    for (int i=0; i<2; ++i) 
-        SDL_RenderDrawLine(renderer,
-                            x_axes + i * step, 0,
-                            x_axes - i * step, height); /* vertical axes line */
+    SDL_RenderDrawLine(renderer, x_axes + step, 0,x_axes - step, height);
+    SDL_RenderDrawLine(renderer, x_axes + step * 2, 0,x_axes - step * 2, height);
+    SDL_RenderDrawLine(renderer, x_axes + step * 3, 0,x_axes - step * 3, height);
 }
 
 void cartesian_coordinates(SDL_Renderer *renderer, int width, int height, TTF_Font *font) {
@@ -299,6 +297,8 @@ int main(int argc, char *argv[]) {
 	SDL_Event event;
 	SDL_StartTextInput();
 
+    int current_plot = 0;
+
 	while (running) {
 		while(SDL_PollEvent(&event)) {
 			switch (event.type) {
@@ -364,14 +364,17 @@ int main(int argc, char *argv[]) {
 								y_axes-=20;
                                 break;
                             case SDLK_n:
-                                x_axes += x_array[next] - x_axes;
-                                y_axes -= y_axes - y_array[next];
-                                next++;
+                                current_plot+=PLOTTING_STEP;
+                                double function = f(current_plot);
+                                
+                                int old_y_axes = y_axes;
+                                y_pos = old_y_axes - function * step;
+
+                                x_axes -= step;
+                                if (y_pos > y_axes)
+                                    y_axes -= y_pos - x_axes;
+                                else y_axes += x_axes - x_pos;
                                 break;
-                            case SDLK_p:
-                                x_axes -= x_axes - x_array[next];
-                                y_axes += y_array[next] - y_axes;
-                                next--;
 							default:
 								break;
 						}
