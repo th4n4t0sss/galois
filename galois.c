@@ -28,7 +28,7 @@ int y_array[10000];
 
 /* TODO: text prompt for inserting mathematical function */
 double f(double x) {
-	return x * x;
+	return x;
 }
 
 /* testing prime numbers */
