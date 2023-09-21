@@ -23,12 +23,12 @@ int x_pos, y_pos;
 
 int x_axes, y_axes;
 
-int x_array[256];
-int y_array[256];
+int x_array[10000];
+int y_array[10000];
 
 /* TODO: text prompt for inserting mathematical function */
 double f(double x) {
-	return x;
+	return x * x;
 }
 
 /* testing prime numbers */
@@ -138,9 +138,6 @@ void plotting(SDL_Renderer *renderer, int width, double line_thickness, TTF_Font
 		x_pos = x * step + x_axes;
 		y_pos = y_axes - function * step;
 
-        x_array[count] = x_pos;
-        y_array[count] = y_pos;
-
 		if (show_line) {
 			if (draw_line) {
 				thickLineRGBA(renderer,
@@ -157,7 +154,6 @@ void plotting(SDL_Renderer *renderer, int width, double line_thickness, TTF_Font
 						  x_pos,y_pos,
 					      line_thickness,
 						  255, 0, 0, 255);
-            printf("%d : %d\n", x_pos, y_pos);
 		}
 
 		previous_x_pos = x_pos;
@@ -167,6 +163,10 @@ void plotting(SDL_Renderer *renderer, int width, double line_thickness, TTF_Font
 			render_number(renderer, font, x, x_pos + line_thickness + 10, y_pos);
 			render_number(renderer, font, (int)function, x_pos + line_thickness + 40, y_pos);
 		}
+
+        x_array[count] = x_pos;
+        y_array[count] = y_pos;
+
         count++;
 	}
 }
@@ -249,7 +249,7 @@ int main(int argc, char *argv[]) {
 	bool cartesian = true;
 
     
-    int next = 0;
+    int next = 10;
 
     SDL_Color textColor = { 255, 255, 255, 255 };
 
@@ -339,8 +339,9 @@ int main(int argc, char *argv[]) {
 							case SDLK_0:
 								x_axes = width / 2;
 								y_axes = height / 2;
+                                next = 10;
 								break;
-							case SDLK_p: /* toggle line drawing on "p" */
+							case SDLK_d: /* toggle line drawing on "p" */
 								show_line = !show_line;
 								break;
 							case SDLK_f: /* TODO: add text prompt for f(x) function */
@@ -363,10 +364,14 @@ int main(int argc, char *argv[]) {
 								y_axes-=20;
                                 break;
                             case SDLK_n:
+                                x_axes += x_array[next] - x_axes;
+                                y_axes -= y_axes - y_array[next];
                                 next++;
-                                x_axes += x_array[next];
-                                y_axes += x_array[next];
                                 break;
+                            case SDLK_p:
+                                x_axes -= x_axes - x_array[next];
+                                y_axes += y_array[next] - y_axes;
+                                next--;
 							default:
 								break;
 						}
