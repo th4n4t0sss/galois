@@ -367,13 +367,17 @@ int main(int argc, char *argv[]) {
                                 current_plot+=PLOTTING_STEP;
                                 double function = f(current_plot);
                                 
-                                int old_y_axes = y_axes;
-                                y_pos = old_y_axes - function * step;
+                                y_pos = y_axes - function * step;
 
                                 x_axes -= step;
-                                if (y_pos > y_axes)
-                                    y_axes -= y_pos - x_axes;
-                                else y_axes += x_axes - x_pos;
+                                y_axes += step;
+                                break;
+                            case SDLK_p:
+                                current_plot-=PLOTTING_STEP;
+                                function = f(current_plot);
+
+                                x_axes += step;
+                                y_axes -= step;
                                 break;
 							default:
 								break;
