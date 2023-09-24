@@ -23,9 +23,6 @@ int x_pos, y_pos;
 
 int x_axes, y_axes;
 
-int x_array[10000];
-int y_array[10000];
-
 /* TODO: text prompt for inserting mathematical function */
 double f(double x) {
 	return x;
@@ -131,8 +128,6 @@ void plotting(SDL_Renderer *renderer, int width, double line_thickness, TTF_Font
 	previous_y_pos = 0;
 
 	bool draw_line = false;
-    int count = 0;
-
 	for (double x = -x_max; x <= x_max; x += PLOTTING_STEP) { /* looping through all values of x */
 		double function = f(x);
 		
@@ -164,11 +159,6 @@ void plotting(SDL_Renderer *renderer, int width, double line_thickness, TTF_Font
 			render_number(renderer, font, x, x_pos + line_thickness + 10, y_pos);
 			render_number(renderer, font, (int)function, x_pos + line_thickness + 40, y_pos);
 		}
-
-        x_array[count] = x_pos;
-        y_array[count] = y_pos;
-
-        count++;
 	}
 }
 
@@ -401,6 +391,7 @@ int main(int argc, char *argv[]) {
 					break;
 			}
 		}
+
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 		SDL_RenderClear(renderer);
 
@@ -430,7 +421,7 @@ int main(int argc, char *argv[]) {
 		SDL_RenderPresent(renderer);
 	}
 
-	sdl_clean_up(window, renderer, font, prompt_font);
+    sdl_clean_up(window, renderer, font, prompt_font);
 
-	return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }
