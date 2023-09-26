@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <math.h>
+
+#include "./function.h"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -22,11 +23,6 @@ int previous_x_pos, previous_y_pos;
 int x_pos, y_pos;
 
 int x_axes, y_axes;
-
-/* TODO: text prompt for inserting mathematical function */
-double f(double x) {
-	return x;
-}
 
 /* testing prime numbers */
 bool is_prime(int n) {
